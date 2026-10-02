@@ -96,6 +96,7 @@ async def audit_request(request: Request, call_next):
             "ticket_id": getattr(request.state, "ticket_id", None),
             "category": getattr(request.state, "category", None),
             "backend": getattr(request.state, "backend", None),
+            "model_output": getattr(request.state, "model_output", None),
             "error": error or getattr(request.state, "error", None),
         }))
 
@@ -129,7 +130,9 @@ Ticket Narrative:
         result = response.json()
         category = result["response"].strip()
         if category not in CATEGORIES:
-            raise ValueError("Model did not return an exact category")
+            request.state.error = "invalid_model_category"
+            request.state.model_output = category[:2000]
+            raise HTTPException(status_code=502, detail="Ollama returned text that is not an exact allowed category; see model_output in the service log")
         request.state.backend = {key: result.get(key) for key in (
             "total_duration", "load_duration", "prompt_eval_count",
             "prompt_eval_duration", "eval_count", "eval_duration",

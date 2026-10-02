@@ -42,6 +42,19 @@ def committed_file(path):
     return hashlib.sha256(current).hexdigest()
 
 
+def verify_service_identity(headers, expected):
+    differences = [
+        f"{key}: command={value!r}, service={headers.get(key)!r}"
+        for key, value in expected.items() if headers.get(key) != value
+    ]
+    if differences:
+        raise ValueError(
+            "Service identity differs from the accuracy command:\n  "
+            + "\n  ".join(differences)
+            + "\nUse the running service's model, digest and run ID if this is the intended run."
+        )
+
+
 def accuracy_metrics(records):
     labels = CATEGORIES + ["ERROR"]
     matrix = {actual: {predicted: 0 for predicted in labels} for actual in CATEGORIES}
@@ -75,8 +88,7 @@ def run_accuracy_test(golden_csv_path, target_url, prediction_record, model, dig
     probe = requests.get(target_url.removesuffix("/tickets") + "/stats", timeout=10)
     probe.raise_for_status()
     expected = {"X-Model-Name": model, "X-Model-Digest": digest, "X-Run-ID": run_id}
-    if any(probe.headers.get(k) != v for k, v in expected.items()):
-        raise ValueError("Service model/digest/run ID does not match this accuracy run")
+    verify_service_identity(probe.headers, expected)
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)
     metadata = {"model": model, "digest": digest, "run_id": run_id, "team": team,
@@ -97,9 +109,10 @@ def run_accuracy_test(golden_csv_path, target_url, prediction_record, model, dig
                 response = requests.post(target_url, json={"narrative": source[row]["narrative"]},
                     headers={"X-Request-ID": request_id, "X-Source-Row": str(row)}, timeout=timeout)
                 status = response.status_code
+                if not response.ok:
+                    raise ValueError(f"HTTP {status}: {response.text[:1000]}")
                 response.raise_for_status()
-                if any(response.headers.get(k) != v for k, v in expected.items()):
-                    raise ValueError("Service identity changed during run")
+                verify_service_identity(response.headers, expected)
                 category = response.json()["category"]
                 if category not in CATEGORIES:
                     raise ValueError("Invalid prediction")
