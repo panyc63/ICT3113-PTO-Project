@@ -1,0 +1,8 @@
+/.venv
+/__pycache__
+__pycache__/
+*.pyc
+runtime/
+*.db
+.env
+# Keep reported service logs and JMeter .jtl files versioned, as required.
