@@ -1,6 +1,6 @@
 # ICT3113 Assignment 1 Team P2-11
 
-This repository implements the synchronous ticket triage baseline and prepares test inputs from `data/ict3113_tickets.csv`. Team 11 uses the **1,000 records numbered 11000 through 11999**, inclusive. Row numbers refer to the CSV's `row` column, not physical text lines: many narratives contain line breaks.
+This repository implements the synchronous ticket triage baseline and prepares test inputs from `data/ict3113_tickets.csv`. Team P2-11 uses the **1,000 records numbered 11000 through 11999**, inclusive. Row numbers refer to the CSV's `row` column, not physical text lines: many narratives contain line breaks.
 
 The original CSV is preserved. The service does not read it or preload any tickets. The client-side preparation and accuracy tools read it; tickets reach the service one at a time through `POST /tickets`, as required by the assignment.
 
@@ -14,6 +14,7 @@ The original CSV is preserved. The service does not read it or preload any ticke
 | CPU-only local Ollama | No GPU device access in Compose; requests set `num_gpu=0`; cloud disabled; capture live `ollama ps` evidence during actual runs |
 | Straightforward baseline, no application caching or queues | Preserved; each POST waits for inference and database insertion |
 | Every request logged | JSONL audit logs include status, duration, request ID, source row, model tag/digest and run ID, including GET and error responses |
+| 175 human labelled tickets | Two blank sheets for the same reproducible 175-ticket;
 | Protocol, agreement and recorded resolutions | Agreement calculator supplied; team must write/revise protocol, label independently and record adjudications |
 | Frozen golden labels and predictions committed before first benchmark | Accuracy runner checks both input files against HEAD; actual final files and freeze commit still missing |
 | Quantitative workload and justified numeric requirements | Missing; needs cited ticket/search volumes, peaks, length distribution and measurable targets |
@@ -41,7 +42,7 @@ The following files have already been prepared in `data/team11/`:
 The existing `data/team11/` files are ready for labelling. You do **not** need to run preparation again. Only if you deliberately need another copy in a new directory, use:
 
 ```powershell
-python prepare_data.py --team 11 --output data/team11-new
+python prepare_data.py --team p2-11 --output data/team11-new
 ```
 
 The preparation tool refuses to overwrite an existing directory. Do not replace a frozen sample after viewing model outputs.
@@ -75,7 +76,7 @@ Use exactly one of these values in each `category` cell:
 python calculate_agreement.py data/team11/labels_member1.csv data/team11/labels_member2.csv --output results/agreement
 ```
 
-This writes Cohen's kappa, raw agreement and a disagreement sheet with blank resolution fields. It rejects mismatched row sets, duplicate IDs, incomplete labels and rows outside Team 11. An undefined kappa is written as `null`, not an invented score.
+This writes Cohen's kappa, raw agreement and a disagreement sheet with blank resolution fields. It rejects mismatched row sets, duplicate IDs, incomplete labels and rows outside Team P2-11. An undefined kappa is written as `null`, not an invented score.
 
 If you see `ValueError: Missing or invalid category for row 11000 ...`, open the named sheet and check the `category` cell for source row 11000. A blank cell means labelling is still pending; otherwise check that the value exactly matches one of the seven names above. Complete all remaining labels before rerunning. This error is unrelated to Docker or the model backend.
 
@@ -141,7 +142,7 @@ git commit -m "Freeze golden labels and predictions before benchmarking"
 Use the actual prediction filename if different. A missing prediction record must be written first. If the evaluator says it cannot read `HEAD:data/team11/golden.csv`, the local golden file is not available in the latest commit. Do not commit practice labels as if they were final human labels. After committing, run:
 
 ```powershell
-python evaluate_accuracy.py data/team11/golden.csv --target-url http://SUT-IP:8000/tickets --prediction-record predictions.md --model EXACT-TAG --digest FULL-DIGEST --run-id UNIQUE-RUN-ID --output results/UNIQUE-RUN-ID
+python evaluate_accuracy.py data/team11/golden.csv --target-url http://localhost:8000/tickets --prediction-record predictions.md --model EXACT-TAG --digest FULL-DIGEST --run-id UNIQUE-RUN-ID --output results/UNIQUE-RUN-ID
 ```
 
 The runner joins final labels by `row` to narratives from the original `ict3113_tickets.csv`, verifies service identity, and posts each golden ticket once. It preserves predictions, request IDs, HTTP errors and elapsed times in CSV, with dataset and frozen-input hashes in metadata. `accuracy.json` includes overall accuracy, per-category recall (correct predictions divided by true-category support), and a labelled confusion matrix. Failed requests stay in the denominator and appear in the `ERROR` column. Outputs never overwrite a prior run directory. Do not use this sequential accuracy script for throughput or latency requirement evidence: that requires open-loop JMeter.
@@ -156,7 +157,7 @@ A complete, exercised `.jmx` playbook and reported runs are still required. Use 
    ```groovy
    int sourceRow = Integer.parseInt(vars.get('row'))
    if (sourceRow < 11000 || sourceRow > 11999) {
-       throw new IllegalArgumentException('Source row outside Team 11')
+       throw new IllegalArgumentException('Source row outside Team P2-11')
    }
    vars.put('payload', new String(java.util.Base64.getDecoder().decode(vars.get('payload_b64')), java.nio.charset.StandardCharsets.UTF_8))
    vars.put('request_id', java.util.UUID.randomUUID().toString())
