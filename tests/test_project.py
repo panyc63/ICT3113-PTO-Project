@@ -38,7 +38,7 @@ class ServiceTests(unittest.TestCase):
     def test_empty_then_post_search_and_stats(self):
         self.assertEqual(self.client.get("/stats").json(), dict.fromkeys(CATEGORIES, 0))
         response = Mock()
-        response.json.return_value = {"response": "Mortgage", "eval_count": 4}
+        response.json.return_value = {"response": '{"category":"Mortgage"}', "eval_count": 4}
         with patch("main.requests.post", return_value=response) as post:
             saved = self.client.post("/tickets", json={"narrative": "Mortgage complaint\nsecond line"},
                                      headers={"X-Request-ID": "test-post", "X-Source-Row": "11000"})
@@ -46,9 +46,31 @@ class ServiceTests(unittest.TestCase):
         self.assertEqual(saved.json()["category"], "Mortgage")
         self.assertEqual(post.call_args.kwargs["json"]["options"]["num_gpu"], 0)
         self.assertFalse(post.call_args.kwargs["json"]["stream"])
+        self.assertEqual(post.call_args.kwargs["json"]["format"]["properties"]["category"]["enum"], CATEGORIES)
+        self.assertEqual(saved.headers["X-Output-Format"], "category-json-v1")
         self.assertEqual(len(self.client.get("/search", params={"q": "Mortgage"}).json()), 1)
         self.assertEqual(self.client.get("/stats").json()["Mortgage"], 1)
         self.assertEqual(saved.headers["X-Request-ID"], "test-post")
+
+    def test_all_seven_structured_categories_are_stored(self):
+        for expected in CATEGORIES:
+            raw = json.dumps({"category": expected}, indent=2)
+            with self.subTest(raw=raw):
+                response = Mock()
+                response.json.return_value = {"response": raw}
+                with patch("main.requests.post", return_value=response):
+                    result = self.client.post("/tickets", json={"narrative": "test"})
+                self.assertEqual(result.status_code, 200)
+                self.assertEqual(result.json()["category"], expected)
+        self.assertEqual(self.client.get("/stats").json(), dict.fromkeys(CATEGORIES, 1))
+
+    def test_explanations_and_multiple_categories_still_rejected(self):
+        for value in ("The category is Mortgage", "Bank Account/Servicing", "Credit Collection Services",
+                      "Bank account", "Credit Reporting; Mortgage; Debt Collection", "",
+                      '{"category": ["Mortgage", "Credit card"]}', '{"category": "Unknown"}',
+                      '{"category": "Mortgage", "explanation": "extra"}', '[]', '{}', 'null'):
+            with self.subTest(value=value), self.assertRaises((ValueError, TypeError)):
+                main.parse_category(value)
 
     def test_bad_backend_output_is_not_fake_credit_reporting(self):
         for payload in ({"response": "Credit reporting or Mortgage"}, {"error": "missing model"},

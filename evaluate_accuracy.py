@@ -89,9 +89,13 @@ def run_accuracy_test(golden_csv_path, target_url, prediction_record, model, dig
     probe.raise_for_status()
     expected = {"X-Model-Name": model, "X-Model-Digest": digest, "X-Run-ID": run_id}
     verify_service_identity(probe.headers, expected)
+    output_format = probe.headers.get("X-Output-Format")
+    if output_format:
+        expected["X-Output-Format"] = output_format
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)
     metadata = {"model": model, "digest": digest, "run_id": run_id, "team": team,
+                "output_format": output_format or "legacy-text",
                 "golden_sha256": golden_hash, "prediction_record_sha256": predictions_hash,
                 "dataset_sha256": hashlib.sha256(Path(dataset).read_bytes()).hexdigest(),
                 "git_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()}

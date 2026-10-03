@@ -105,7 +105,7 @@ $models = (Invoke-RestMethod http://localhost:11434/api/tags).models
 $models | Select-Object name,digest,details
 $env:MODEL_NAME = 'llama3.2:1b'
 $env:MODEL_DIGEST = ($models | Where-Object name -eq $env:MODEL_NAME).digest
-$env:RUN_ID = 'llama32-1b-accuracy-01'
+$env:RUN_ID = 'P2-11'
 docker compose up -d --build --force-recreate triage-service
 ```
 
@@ -142,7 +142,7 @@ git commit -m "Freeze golden labels and predictions before benchmarking"
 Use the actual prediction filename if different. A missing prediction record must be written first. If the evaluator says it cannot read `HEAD:data/team11/golden.csv`, the local golden file is not available in the latest commit. Do not commit practice labels as if they were final human labels. After committing, run:
 
 ```powershell
-python evaluate_accuracy.py data/team11/golden.csv --target-url http://localhost:8000/tickets --prediction-record predictions.md --model EXACT-TAG --digest FULL-DIGEST --run-id UNIQUE-RUN-ID --output results/UNIQUE-RUN-ID
+python evaluate_accuracy.py data/team11/golden.csv --target-url http://localhost:8000/tickets --prediction-record predictions.md --model "llama3.2:1b" --digest $env:MODEL_DIGEST --run-id "P2-11" --output results/folder_name
 ```
 
 The runner joins final labels by `row` to narratives from the original `ict3113_tickets.csv`, verifies service identity, and posts each golden ticket once. It preserves predictions, request IDs, HTTP errors and elapsed times in CSV, with dataset and frozen-input hashes in metadata. `accuracy.json` includes overall accuracy, per-category recall (correct predictions divided by true-category support), and a labelled confusion matrix. Failed requests stay in the denominator and appear in the `ERROR` column. Outputs never overwrite a prior run directory. Do not use this sequential accuracy script for throughput or latency requirement evidence: that requires open-loop JMeter.

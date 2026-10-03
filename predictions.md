@@ -47,14 +47,4 @@ We predict Debt collection and Credit reporting will be the hardest pair to dist
 
 For the 1B candidate, we predict recall below 65% for both categories. We also expect confusion between Bank account or service and Money transfer or service, because transfers are commonly initiated through a bank account. Mortgage should be easier where the narrative explicitly names mortgage servicing, escrow or foreclosure; we predict at least 75% Mortgage recall for the 1B candidate. These per-category claims assume the final reference set includes examples of each category.
 
-## Comparing predictions with results
 
-Keep these estimates unchanged once the team adopts and commits this record for future runs. Record observed accuracy, median latency, per-category recall and bottleneck evidence separately, then explain departures from the predictions in Slide 11. A later commit cannot establish that this draft predates already completed runs.
-
-## Sources for candidate identity
-
-- [Ollama llama3.2:1b](https://ollama.com/library/llama3.2:1b)
-- [Ollama llama3.2:3b](https://ollama.com/library/llama3.2:3b)
-- [Ollama qwen2.5:7b](https://ollama.com/library/qwen2.5:7b)
-
-These sources establish candidate availability and model details; they do not substantiate the numerical predictions above.
