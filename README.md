@@ -152,19 +152,19 @@ The runner joins final labels by `row` to narratives from the original `ict3113_
 A complete, exercised `.jmx` playbook and reported runs are still required. Use Apache JMeter's Open Model Thread Group or Precise Throughput Timer; a conventional closed-loop user-count test is not acceptable. The following is the data integration for the future plan, not a completed playbook:
 
 1. Copy `data/team11/jmeter_tickets.csv` to the separate load-generator machine. Configure CSV Data Set Config with UTF-8 encoding, comma delimiter, variable names `row,payload_b64`, ignore first line, recycle on EOF, and sharing across all threads.
-2. Add a Groovy JSR223 PreProcessor before the ticket sampler:
+2. The saved `ticket-load-test.jmx` uses a BeanShell PreProcessor named **Prepare ticket payload**. This avoids the bundled Groovy engine's `Unsupported class file major version 67` error observed with Java 23. Its script is:
 
-   ```groovy
-   int sourceRow = Integer.parseInt(vars.get('row'))
+   ```java
+   int sourceRow = Integer.parseInt(vars.get("row"));
    if (sourceRow < 11000 || sourceRow > 11999) {
-       throw new IllegalArgumentException('Source row outside Team P2-11')
+       throw new IllegalArgumentException("Source row outside Team P2-11");
    }
-   vars.put('payload', new String(java.util.Base64.getDecoder().decode(vars.get('payload_b64')), java.nio.charset.StandardCharsets.UTF_8))
-   vars.put('request_id', java.util.UUID.randomUUID().toString())
+   vars.put("payload", new String(java.util.Base64.getDecoder().decode(vars.get("payload_b64")), "UTF-8"));
+   vars.put("request_id", System.currentTimeMillis() + "-" + System.nanoTime() + "-" + ctx.getThreadNum());
    ```
 
 3. Send `${payload}` as the raw POST body with `Content-Type: application/json`, `X-Source-Row: ${row}` and `X-Request-ID: ${request_id}`. Do not wrap the decoded payload in quotes or escape it again. Save `row` and `request_id` as JMeter sample variables in the JTL for log reconciliation. Give GET requests their own unique IDs too.
-4. Set independent controlled arrival schedules for ticket and search traffic according to the workload model. Keep warm-up and measured periods explicit, and document the database reset policy, search queries and seeded data (if needed, seed only through POST from team rows).
+4. Set independent controlled arrival schedules for ticket and search traffic according to the workload model. Keep warm-up and measured periods explicit, and document the database reset policy, search queries and seeded data (if needed, seed only through POST from team rows). The saved plan is only a local setup check: `rate(1/sec) random_arrivals(5 sec) rate(1/sec) pause(30 sec)`. The final pause permits outstanding requests to finish; ending the schedule immediately can interrupt them. Extend this waiting period for slower models. The test stays active for about 35 seconds even if its five requests finish earlier. Reopen the saved plan in JMeter after external edits; do not overwrite it with an older open copy.
 5. Specify exact rates, durations, timeouts, random seeds, assertions, software versions, command lines and stopping criteria before running. Record observed starts and completions to detect generator saturation or growing backlog. Ensure the generator has enough capacity to maintain arrivals under slow responses.
 6. Repeat every model/rate configuration three times. Keep raw JTL, matching service JSONL, model pins and environment metadata for each unique run. Calculate p50/p95/p99 response elapsed time, successful ticket throughput, error rate and the mean/spread across the three runs. Explain time windows and treatment of timeouts; do not substitute JMeter's time-to-first-byte `Latency` field for full response time.
 7. Execute a preplanned stress test for at least one model, determining a measurable limit. Then compare measurements against the committed predictions and numeric requirements and make the recommendation.
