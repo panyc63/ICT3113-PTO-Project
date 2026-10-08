@@ -15,8 +15,11 @@ os.environ.update(DB_PATH=str(Path(TEMP.name) / "tickets.db"),
                   LOG_PATH=str(Path(TEMP.name) / "audit.jsonl"),
                   RUN_ID="development", MODEL_DIGEST="")
 from fastapi.testclient import TestClient
+from fastapi.routing import APIRoute
 import requests
 import main
+from api import runtime
+from api.routes import create_ticket, get_stats, search_tickets
 from categories import CATEGORIES
 from dataset import DEFAULT_DATASET, label_rows, read_csv, team_rows, write_csv
 from prepare_data import prepare
@@ -26,8 +29,8 @@ from evaluate_accuracy import accuracy_metrics
 
 class ServiceTests(unittest.TestCase):
     def setUp(self):
-        main.init_db()
-        with closing(main.get_db()) as conn, conn:
+        runtime.init_db()
+        with closing(runtime.get_db()) as conn, conn:
             conn.execute("DELETE FROM tickets")
         self.client_context = TestClient(main.app, raise_server_exceptions=False)
         self.client = self.client_context.__enter__()
@@ -39,7 +42,7 @@ class ServiceTests(unittest.TestCase):
         self.assertEqual(self.client.get("/stats").json(), dict.fromkeys(CATEGORIES, 0))
         response = Mock()
         response.json.return_value = {"response": '{"category":"Mortgage"}', "eval_count": 4}
-        with patch("main.requests.post", return_value=response) as post:
+        with patch("api.routes.create_ticket.requests.post", return_value=response) as post:
             saved = self.client.post("/tickets", json={"narrative": "Mortgage complaint\nsecond line"},
                                      headers={"X-Request-ID": "test-post", "X-Source-Row": "11000"})
         self.assertEqual(saved.status_code, 200)
@@ -58,7 +61,7 @@ class ServiceTests(unittest.TestCase):
             with self.subTest(raw=raw):
                 response = Mock()
                 response.json.return_value = {"response": raw}
-                with patch("main.requests.post", return_value=response):
+                with patch("api.routes.create_ticket.requests.post", return_value=response):
                     result = self.client.post("/tickets", json={"narrative": "test"})
                 self.assertEqual(result.status_code, 200)
                 self.assertEqual(result.json()["category"], expected)
@@ -70,7 +73,7 @@ class ServiceTests(unittest.TestCase):
                       '{"category": ["Mortgage", "Credit card"]}', '{"category": "Unknown"}',
                       '{"category": "Mortgage", "explanation": "extra"}', '[]', '{}', 'null'):
             with self.subTest(value=value), self.assertRaises((ValueError, TypeError)):
-                main.parse_category(value)
+                create_ticket.parse_category(value)
 
     def test_bad_backend_output_is_not_fake_credit_reporting(self):
         for payload in ({"response": "Credit reporting or Mortgage"}, {"error": "missing model"},
@@ -78,16 +81,16 @@ class ServiceTests(unittest.TestCase):
             with self.subTest(payload=payload):
                 response = Mock()
                 response.json.return_value = payload
-                with patch("main.requests.post", return_value=response):
+                with patch("api.routes.create_ticket.requests.post", return_value=response):
                     self.assertEqual(self.client.post("/tickets", json={"narrative": "text"}).status_code, 502)
         self.assertEqual(sum(self.client.get("/stats").json().values()), 0)
 
     def test_upstream_http_failure_and_timeout(self):
         response = Mock()
         response.raise_for_status.side_effect = requests.HTTPError("500")
-        with patch("main.requests.post", return_value=response):
+        with patch("api.routes.create_ticket.requests.post", return_value=response):
             self.assertEqual(self.client.post("/tickets", json={"narrative": "text"}).status_code, 502)
-        with patch("main.requests.post", side_effect=requests.Timeout):
+        with patch("api.routes.create_ticket.requests.post", side_effect=requests.Timeout):
             self.assertEqual(self.client.post("/tickets", json={"narrative": "text"}).status_code, 504)
 
     def test_all_request_paths_and_failures_are_logged(self):
@@ -99,24 +102,38 @@ class ServiceTests(unittest.TestCase):
         ]:
             request_id = f"audit-{method}-{path}-{len(kwargs)}"
             response = self.client.request(method, path, headers={"X-Request-ID": request_id}, **kwargs)
-            records = [json.loads(line) for line in main.LOG_PATH.read_text().splitlines()]
+            records = [json.loads(line) for line in runtime.LOG_PATH.read_text().splitlines()]
             record = next(r for r in reversed(records) if r["request_id"] == request_id)
             self.assertEqual(record["status"], response.status_code)
             self.assertGreaterEqual(record["duration_ms"], 0)
 
     def test_internal_failure_is_logged(self):
-        with patch("main.get_db", side_effect=RuntimeError("test failure")):
+        with patch("api.runtime.get_db", side_effect=RuntimeError("test failure")):
             self.assertEqual(self.client.get("/stats", headers={"X-Request-ID": "internal-error"}).status_code, 500)
-        records = [json.loads(line) for line in main.LOG_PATH.read_text().splitlines()]
+        records = [json.loads(line) for line in runtime.LOG_PATH.read_text().splitlines()]
         self.assertEqual(records[-1]["error"], "RuntimeError")
 
     def test_pin_mismatch_blocks_startup(self):
         response = Mock()
-        response.json.return_value = {"models": [{"name": main.MODEL_NAME, "digest": "actual"}]}
-        with patch.object(main, "MODEL_DIGEST", "expected"), patch("main.requests.get", return_value=response):
+        response.json.return_value = {"models": [{"name": runtime.MODEL_NAME, "digest": "actual"}]}
+        with patch.object(runtime, "MODEL_DIGEST", "expected"), patch("main.requests.get", return_value=response):
             with self.assertRaises(RuntimeError):
                 with TestClient(main.app):
                     pass
+
+    def test_endpoints_are_registered_from_separate_route_modules(self: "ServiceTests") -> None:
+        expected: dict[str, tuple[str, str]] = {
+            "/tickets": ("POST", create_ticket.__name__),
+            "/search": ("GET", search_tickets.__name__),
+            "/stats": ("GET", get_stats.__name__),
+        }
+        registered: dict[str, APIRoute] = {
+            route.path: route for route in main.app.routes if isinstance(route, APIRoute)
+        }
+        self.assertEqual(set(registered), set(expected))
+        for path, (method, module_name) in expected.items():
+            self.assertEqual(registered[path].methods, {method})
+            self.assertEqual(registered[path].endpoint.__module__, module_name)
 
 
 class DatasetTests(unittest.TestCase):
