@@ -1,0 +1,11 @@
+{
+  "model": "llama3.2:3b",
+  "digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72",
+  "run_id": "P2-11",
+  "team": 11,
+  "output_format": "category-json-v1",
+  "golden_sha256": "c312e7a3d1badd342d73716282e237bfffd4cdb79ec5c8b87b600609c5275214",
+  "prediction_record_sha256": "eff3b9ab9cc4b4aad913f5b2adc52b033df2f182aea5010150704374b18e141c",
+  "dataset_sha256": "f69db3f5166404cc09040ae2c26b82ca5aa9a07da34a802226d7a07d0c225fd9",
+  "git_commit": "75317e17d05a869d10ea5f5063397f5e94d863fc"
+}
