@@ -1,0 +1,26 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect,"row","request_id"
+1791547779799,31,GET /search,200,OK,Searches (open model) 2-1,text,true,,356,189,1,1,http://192.168.88.6:8000/search?q=late+fee,31,0,20,null,null
+1791547782339,18,GET /search,200,OK,Searches (open model) 2-2,text,true,,356,192,1,1,http://192.168.88.6:8000/search?q=foreclosure,18,0,9,null,null
+1791547794197,1208,POST /tickets,200,OK,Tickets (open model) 1-1,text,true,,388,467,1,1,http://192.168.88.6:8000/tickets,1208,0,12,11000,1791547794195-895696607019000-0
+1791547810768,18,GET /search,200,OK,Searches (open model) 2-3,text,true,,356,194,1,2,http://192.168.88.6:8000/search?q=wire+transfer,18,0,6,null,null
+1791547809051,5607,POST /tickets,200,OK,Tickets (open model) 1-2,text,true,,383,2245,1,1,http://192.168.88.6:8000/tickets,5606,0,9,11001,1791547809050-895711462589700-1
+1791547818020,666,POST /tickets,200,OK,Tickets (open model) 1-3,text,true,,385,2115,1,1,http://192.168.88.6:8000/tickets,666,0,7,11002,1791547818018-895720431484400-2
+1791547823186,24,GET /search,200,OK,Searches (open model) 2-4,text,true,,2420,194,1,1,http://192.168.88.6:8000/search?q=credit+report,24,0,16,null,null
+1791547844342,824,POST /tickets,200,OK,Tickets (open model) 1-4,text,true,,395,1516,1,1,http://192.168.88.6:8000/tickets,824,0,6,11003,1791547844341-895746757093100-3
+1791547848959,15,GET /search,200,OK,Searches (open model) 2-5,text,true,,356,190,1,2,http://192.168.88.6:8000/search?q=overdraft,15,0,7,null,null
+1791547848490,1305,POST /tickets,200,OK,Tickets (open model) 1-5,text,true,,388,487,1,1,http://192.168.88.6:8000/tickets,1305,0,6,11004,1791547848489-895750905048300-4
+1791547867728,15,GET /search,200,OK,Searches (open model) 2-6,text,true,,356,191,1,1,http://192.168.88.6:8000/search?q=collection,15,0,6,null,null
+1791547875143,16,GET /search,200,OK,Searches (open model) 2-7,text,true,,356,194,1,1,http://192.168.88.6:8000/search?q=interest+rate,16,0,7,null,null
+1791547942358,1202,POST /tickets,200,OK,Tickets (open model) 1-6,text,true,,385,478,1,1,http://192.168.88.6:8000/tickets,1202,0,9,11005,1791547942356-895844781682900-5
+1791547955777,15,GET /search,200,OK,Searches (open model) 2-8,text,true,,4354,189,1,1,http://192.168.88.6:8000/search?q=late+fee,13,0,6,null,null
+1791548018002,16,GET /search,200,OK,Searches (open model) 2-9,text,true,,356,192,1,1,http://192.168.88.6:8000/search?q=foreclosure,16,0,7,null,null
+1791548072650,20,GET /search,200,OK,Searches (open model) 2-10,text,true,,356,194,1,1,http://192.168.88.6:8000/search?q=wire+transfer,20,0,8,null,null
+1791548074268,18,GET /search,200,OK,Searches (open model) 2-11,text,true,,2730,194,1,1,http://192.168.88.6:8000/search?q=credit+report,18,0,8,null,null
+1791548076342,15,GET /search,200,OK,Searches (open model) 2-12,text,true,,356,190,1,1,http://192.168.88.6:8000/search?q=overdraft,15,0,7,null,null
+1791548109445,13,GET /search,200,OK,Searches (open model) 2-13,text,true,,356,191,1,1,http://192.168.88.6:8000/search?q=collection,13,0,6,null,null
+1791548110875,3871,POST /tickets,200,OK,Tickets (open model) 1-7,text,true,,388,1512,2,2,http://192.168.88.6:8000/tickets,3871,0,7,11006,1791548110874-896013315989600-6
+1791548114660,2686,POST /tickets,200,OK,Tickets (open model) 1-8,text,true,,395,950,1,1,http://192.168.88.6:8000/tickets,2686,0,7,11007,1791548114659-896017102008700-7
+1791548159390,14,GET /search,200,OK,Searches (open model) 2-14,text,true,,356,194,1,1,http://192.168.88.6:8000/search?q=interest+rate,14,0,6,null,null
+1791548198749,14,GET /search,200,OK,Searches (open model) 2-15,text,true,,4354,189,1,1,http://192.168.88.6:8000/search?q=late+fee,14,0,5,null,null
+1791548245178,17,GET /search,200,OK,Searches (open model) 2-16,text,true,,356,192,1,1,http://192.168.88.6:8000/search?q=foreclosure,17,0,6,null,null
+1791548269696,15,GET /search,200,OK,Searches (open model) 2-17,text,true,,356,194,1,1,http://192.168.88.6:8000/search?q=wire+transfer,15,0,7,null,null
