@@ -1,10 +1,10 @@
 # Stage 4: Candidate Models, Requirements and Predictions
 
 **Team:** P2-11  
-**Updated:** 6 October 2026  
-**Status:** Draft proposal; acceptance targets and validation are pending.
+**Updated:** 9 October 2026  
+**Status:** Acceptance benchmarks adopted; model and test-environment validation remain pending.
 
-This report presents three candidate models for the ticket-classification service, the workload they must support, and the proposed performance and accuracy forecasts. The evaluation will compare each candidate against agreed acceptance targets to support a model recommendation. Fields marked **Pending** identify decisions or evidence required to complete the evaluation plan.
+This report presents three candidate models for the ticket-classification service, the workload they must support, the adopted acceptance benchmarks, and the proposed performance and accuracy forecasts. The evaluation will compare each candidate against these benchmarks to support a model recommendation. Fields marked **Pending** identify decisions or evidence required to complete the evaluation plan.
 
 **Forecast status:** These forecasts are provisional planning estimates and must not be presented as the predictions used for actual benchmark runs. A pre-test comparison requires evidence that the prediction baseline and golden set were committed before the first benchmark. Once frozen, the prediction baseline must remain unchanged.
 
@@ -13,7 +13,7 @@ This report presents three candidate models for the ticket-classification servic
 | Deliverable | Current status | Next action |
 | --- | --- | --- |
 | Candidate models | Three candidates, their full digests and selection rationale are recorded. | Confirm installed versions and quantisation details. |
-| Performance and accuracy requirements | Proposed ticket, search and combined evaluation workloads are recorded. | Confirm workload assumptions and agree numeric acceptance targets and their business justification. |
+| Performance and accuracy requirements | Acceptance benchmarks and their justification are adopted for the rounded peak workload of 160 ticket submissions/hour and 320 searches/hour. | Measure each candidate against the adopted benchmarks; confirm whether dashboard traffic is included. |
 | Predictions | Bottleneck, accuracy, latency and difficult-category forecasts are defined. | Strengthen the numerical rationale and establish the dated baseline for comparison with results. |
 
 ## 2. Proposed candidate models
@@ -76,7 +76,7 @@ The performance evaluation brings the ticket and search streams together using t
 | Whole active-day average | 78.67 | 157.33 | 236.00 |
 | Peak | 157.33 | 314.67 | 472.00 |
 
-The proposed rounded peak test rates are **160 ticket submissions/hour and 320 searches/hour**, approximately **1.7% above the derived peak**. Optional shared-dashboard monitoring would add **60 `GET /stats` requests/hour**, or **480 requests per working day**. **Pending:** confirm whether dashboard traffic is included in the final workload.
+The adopted rounded peak test rates are **160 ticket submissions/hour and 320 searches/hour**, approximately **1.7% above the derived peak**. Optional shared-dashboard monitoring would add **60 `GET /stats` requests/hour**, or **480 requests per working day**. **Pending:** confirm whether dashboard traffic is included in the final workload.
 
 ### Ticket-length profile
 
@@ -94,18 +94,23 @@ The request narratives have a mean length of **897.86 characters**, a median of 
 
 ## 4. Acceptance requirements
 
-Numeric acceptance targets remain pending. The following decisions will establish the response time, throughput and classification quality required under the adopted peak workload. References: S2 and S6.
+The following benchmarks define the required service quality. Latency, throughput and endpoint failure rates apply under sustained, independent open-loop arrivals of **160 `POST /tickets` submissions/hour and 320 `GET /search` requests/hour**. Accuracy is assessed separately on all **175 golden-set tickets** for each candidate, with one outstanding request at a time. References: S2 and S6.
 
-| Requirement area | Planning basis | Pending decision |
+| Measure | Testable target | Reason |
 | --- | --- | --- |
-| Response time | Single-request median latency forecasts are available for each candidate. | Endpoint, percentile, maximum acceptable response time, load condition and usability justification. |
-| Throughput | Estimated peak intake is 157.33 tickets/hour. The proposed evaluation uses 160 submissions/hour alongside 320 searches/hour, with dashboard traffic pending confirmation. | Minimum successful classifications/hour, sustained-load condition and capacity justification. |
-| Overall accuracy | Candidate forecasts are 65%, 75% and 80%. | Minimum acceptable golden-set accuracy, justified by the consequences of misrouting tickets. |
-| Per-category accuracy | Some categories are expected to be harder to distinguish than others. | Minimum acceptable score for each of the seven categories and the justification for any differences. |
+| POST latency | `POST /tickets` p95 ≤ 15 seconds. | Complete most tickets before the 22.5-second mean arrival gap at the rounded peak test rate of 160 tickets/hour. |
+| Search latency | `GET /search` p95 ≤ 1 second. | Keep case lookup responsive during intake. |
+| Throughput / errors | Mean ≥ 158.4 successful `POST /tickets` completions/hour; ≤ 1% failures per endpoint. | Serve 99% of 160 offered tickets/hour, above the estimated peak demand of 157.33 tickets/hour. |
+| Overall accuracy | ≥ 80%, equivalent to at least 140 correct classifications out of 175. | Limit misrouting to 20% in staff-assisted triage. |
+| Each category recall | ≥ 70% for all seven categories. | Prevent strong categories masking poor routing elsewhere. |
 
 The fixed categories are **Credit reporting, Debt collection, Mortgage, Credit card, Bank account or service, Consumer loan, and Money transfer or service**.
 
-Acceptance requirements define the service quality the client needs. Forecasts estimate what each candidate may achieve. Final requirements will use numeric targets, relevant percentiles and explicit load conditions so that each candidate can be assessed consistently.
+Successful POST throughput counts requests that complete with a valid category and a stored ticket. Classification correctness is assessed separately against the golden labels. Calculate throughput for each measured run as successful completions divided by the measurement duration in hours, then report the mean and spread across the three runs required per configuration.
+
+Calculate endpoint failure rates as failed requests divided by attempted requests × 100, separately for `POST /tickets` and `GET /search`. Timeouts, unsuccessful HTTP responses and invalid API results count as failures. Report latency percentiles, throughput and failure rates for the same measurement window in each run. Dashboard inclusion remains a separate workload decision.
+
+Acceptance requirements define the service quality the client needs. Forecasts estimate what each candidate may achieve. The adopted benchmarks will be applied consistently to every candidate, with any unmet requirement reported explicitly.
 
 ## 5. Evaluation conditions and measures
 
@@ -121,7 +126,7 @@ Acceptance requirements define the service quality the client needs. Forecasts e
 | Accuracy sample | The forecasts assume 175 final reference-labelled tickets. |
 | Load generator | A separate machine is required for reported performance testing. |
 | Performance workload | Independent open-loop ticket and search arrival streams at the adopted rates. |
-| Model timeout | The current default is 120 seconds. This is a service configuration value, not an agreed response-time target. |
+| Model timeout | The current default is 120 seconds. The adopted `POST /tickets` response-time benchmark is p95 ≤ 15 seconds. |
 
 The baseline uses local CPU inference and consistent service settings across all candidates. **Pending:** document the CPU, memory and full test environment needed to interpret latency results. References: S1, S3 and S4; workload method: S2, Section 7.
 
@@ -181,7 +186,7 @@ The forecast rationale is:
 | Bank account or service versus Money transfer or service | Transfers are commonly initiated through a bank account, creating overlapping cues. | No numerical forecast recorded. |
 | Mortgage | Explicit references to mortgage servicing, escrow or foreclosure are expected to make the category easier to identify. | For the 1B candidate, Mortgage recall will be **at least 75%**. |
 
-These category forecasts are conditional on the final golden set containing examples of the relevant categories. Per-category acceptance thresholds remain pending. Reference: S1.
+These category forecasts are conditional on the final golden set containing examples of the relevant categories. The adopted acceptance benchmark requires recall of at least 70% for each of the seven categories. Reference: S1.
 
 ## 7. Actions to complete the evaluation plan
 
@@ -193,10 +198,10 @@ These category forecasts are conditional on the final golden set containing exam
 | Document test hardware and operating conditions. | Pending |
 | Confirm the working calendar, active hours and daily peak profile. | Pending |
 | Confirm the baseline of two searches per ticket. | Pending |
-| Adopt the combined evaluation workload and decide whether to include dashboard traffic. | Pending |
-| Agree the response-time target, percentile, endpoint and load condition. | Pending |
-| Agree the throughput target in successful classifications/hour. | Pending |
-| Agree overall and per-category accuracy targets based on misrouting consequences. | Pending |
+| Adopt the combined evaluation workload and decide whether to include dashboard traffic. | 160 submissions/hour and 320 searches/hour adopted; dashboard inclusion pending. |
+| Agree the response-time target, percentile, endpoint and load condition. | Complete: POST p95 ≤ 15 seconds and search p95 ≤ 1 second under the adopted peak workload. |
+| Agree the throughput target in successful classifications/hour. | Complete: mean ≥ 158.4 successful POST completions/hour and ≤ 1% failures per endpoint. |
+| Agree overall and per-category accuracy targets based on misrouting consequences. | Complete: overall accuracy ≥ 80% and recall ≥ 70% for each category. |
 | Strengthen the numerical forecast rationale and state its uncertainty. | Pending |
 | Establish the dated, frozen prediction and golden-set versions supporting any pre-test comparison. | Pending |
 
