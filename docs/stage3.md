@@ -2,12 +2,12 @@
 
 **Team:** P2-11  
 **Research and measurement date:** 5 October 2026  
-**Updated:** 6 October 2026  
+**Updated:** 9 October 2026  
 **Status:** Proposed workload; operating assumptions are pending confirmation.
 
 This report estimates demand for a central complaints intake and retrieval service. The planning scenario represents a large financial services organisation, using published complaint volumes, explicit operating assumptions and measured test-data characteristics.
 
-Estimated intake is approximately **630 tickets per working day**, with a peak of **157.33 new tickets/hour and 314.67 searches/hour**. Proposed peak test rates are **160 ticket submissions/hour and 320 searches/hour**. These rates establish the demand to assess; response-time, throughput and accuracy acceptance targets remain pending.
+Estimated intake is approximately **630 tickets per working day**, with a peak of **157.33 new tickets/hour and 314.67 searches/hour**. Adopted peak test rates are **160 ticket submissions/hour and 320 searches/hour**. These rates establish the demand to assess; the response-time, throughput, failure-rate and accuracy acceptance benchmarks are adopted in Stage 4.
 
 ## 1. Service scope and planning basis
 
@@ -155,7 +155,7 @@ The evaluation combines the ticket-submission rates from Section 3 with the sear
 
 The submission-to-search request mix is **1:2**. Testing will include both request types to assess how shared service resources affect classification and retrieval.
 
-The proposed evaluation uses **157.33 new tickets/hour plus 314.67 searches/hour** as the estimated peak demand, with the measured narrative-length mix. Rounded test rates of **160 ticket submissions/hour and 320 searches/hour** provide a convenient test workload approximately **1.7% above the derived peak**.
+The evaluation uses **157.33 new tickets/hour plus 314.67 searches/hour** as the estimated peak demand, with the measured narrative-length mix. Adopted rounded test rates of **160 ticket submissions/hour and 320 searches/hour** provide a convenient test workload approximately **1.7% above the derived peak**.
 
 Optional monitoring assumes **one shared dashboard refreshing statistics once per minute during the eight-hour day** through `GET /stats`. This adds **60 requests/hour**, or **480/day**, and would increase estimated peak demand to approximately **532 total requests/hour**. **Pending:** confirm whether dashboard traffic is included in the evaluation workload.
 
@@ -168,10 +168,10 @@ The evaluation will hold the intended arrival rate independently of processing s
 | Confirm working hours and the proposed daily peak profile. | Pending |
 | Confirm the baseline of two searches per ticket. | Pending |
 | Include or exclude shared-dashboard traffic. | Pending |
-| Agree response-time targets and their measurement percentiles. | Pending in Stage 4 |
-| Agree successful-classification throughput and accuracy targets. | Pending in Stage 4 |
+| Agree response-time targets and their measurement percentiles. | Complete in Stage 4 |
+| Agree successful-classification throughput, endpoint failure-rate and accuracy targets. | Complete in Stage 4 |
 
-Acceptance targets will be justified against the adopted workload and the consequences of slow or incorrect classification. Model results will then be compared against those targets. The complaint-volume baseline remains demand-led.
+Stage 4 records the adopted acceptance benchmarks and their justification against the workload and the consequences of slow or incorrect classification. Model results will be compared against those benchmarks. The complaint-volume baseline remains demand-led.
 
 ## 7. Technical appendix
 

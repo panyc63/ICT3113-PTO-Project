@@ -3,7 +3,7 @@
 This plan defines the **six official delivery stages**, their required outputs and completion criteria. The project will establish reference labels, implement a baseline service, assess client demand, evaluate candidate models and present an evidence-based recommendation. Delivery requirements follow the [assignment worksheet](</D:/Files/Proton Drive/My files/[3] SIT/[7] Year 3 - Tri 1/[3] ICT3113 - Performance Testing and Optimisation/[4] Assignments/[1] A1/Assignment 1 Worksheet.docx>).
 
 **Team:** P2-11  
-**Updated:** 6 October 2026  
+**Updated:** 9 October 2026  
 **Data scope:** numbered rows **11000–11999**, inclusive, for all labelling and test traffic.  
 **Submission deadline:** **9 October 2026, 23:59**, via xSiTe.
 
@@ -48,7 +48,7 @@ The workload assessment establishes the demand the service must support. The rep
 | Daily arrival profile | 3 | Peak and non-peak ticket arrival rates. |
 | Search request demand | 4 | Search totals and search-only hourly rates, with search-frequency sensitivity scenarios. |
 | Ticket-length profile | 5 | Measured length ranges, proportions and summary statistics for the permitted traffic pool. |
-| Evaluation workload and pending decisions | 6 | Combined ticket and search traffic, proposed test rates and the optional dashboard workload. |
+| Evaluation workload and pending decisions | 6 | Combined ticket and search traffic, adopted test rates and the optional dashboard workload. |
 | Technical appendix | 7 | Measurement method, input checksum, reproducible script and load-generator configuration. |
 
 **Current readiness:** the assessment is drafted. Working hours, the daily peak profile, search frequency and dashboard inclusion remain pending confirmation.
@@ -67,7 +67,7 @@ This stage defines the candidate models, the service quality required by the cli
 | **Acceptance requirements** | At least one response-time target, one throughput target, and classification-accuracy targets **overall and per category**. Targets specify numeric thresholds, relevant percentiles and load conditions, with justification against client needs and estimated peak demand. |
 | **Forecasts** | Expected bottleneck and rationale; expected accuracy and single-request latency for **each candidate on the test hardware**; difficult categories and rationale. Forecasts are specific and testable. |
 
-**Current readiness:** three candidates and their digests are recorded. Installed versions, quantisation, test hardware, acceptance targets and the numerical forecast rationale require further work. The dated prediction baseline for comparison with benchmark results remains to be established.
+**Current readiness:** three candidates and their digests are recorded. Acceptance benchmarks are adopted for **160 ticket submissions/hour and 320 searches/hour**: **POST p95 ≤ 15 seconds**, **search p95 ≤ 1 second**, **mean ≥ 158.4 successful POST completions/hour**, **≤ 1% failures per endpoint**, **overall accuracy ≥ 80% (at least 140/175)**, and **recall ≥ 70% for each category**. Installed versions, quantisation, test hardware and the numerical forecast rationale require further work. Dashboard inclusion and the dated prediction baseline for comparison with benchmark results remain to be established.
 
 **Completion criteria:** model choices and acceptance requirements are justified, and the prediction record is frozen and committed **before the first benchmark**. Predictions cannot be revised after benchmarking.
 
