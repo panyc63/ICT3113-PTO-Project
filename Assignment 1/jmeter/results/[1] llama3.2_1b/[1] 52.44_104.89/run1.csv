@@ -1,0 +1,4 @@
+Label,# Samples,Average,Median,90% Line,95% Line,99% Line,Min,Max,Error %,Throughput,Received KB/sec,Sent KB/sec
+POST /tickets,8,2791,2662,3721,5932,5932,919,5932,0.000%,.01785,0.01,0.02
+GET /Search,17,15,12,27,29,34,9,34,0.000%,.03431,2.02,0.00
+TOTAL,25,903,14,2701,3721,5932,9,5932,0.000%,.04588,1.84,0.02
