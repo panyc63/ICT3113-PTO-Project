@@ -52,3 +52,19 @@ def accept_categories(value):
 
 def should_escalate(predicted, accepted):
     return predicted not in accepted
+
+
+def verify_installed_models(installed, models):
+    """Distinguish an empty/wrong volume from an installed model version mismatch."""
+    problems = []
+    for model in models:
+        expected = MODEL_DIGESTS[model]
+        actual = installed.get(model)
+        if actual is None:
+            problems.append(f"{model}: not installed (expected digest {expected})")
+        elif actual != expected:
+            problems.append(f"{model}: digest mismatch\n  Expected: {expected}\n  Installed: {actual}")
+    if problems:
+        available = ", ".join(sorted(installed)) or "none"
+        raise ValueError("Assignment 1 model verification failed:\n" + "\n".join(problems)
+                         + f"\nInstalled models: {available}. Check the original Ollama volume and model digests.")

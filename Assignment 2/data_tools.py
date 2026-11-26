@@ -3,8 +3,10 @@ import base64
 import csv
 import hashlib
 import json
+import os
 from pathlib import Path
 import random
+import shutil
 import subprocess
 
 from categories import CATEGORIES
@@ -59,13 +61,37 @@ def verify_split():
     return original
 
 
+def git_executable():
+    """Resolve Git in normal terminals and permit an explicit portable installation."""
+    override = os.getenv("GIT_EXE")
+    if override:
+        executable = shutil.which(override)
+        if executable:
+            return executable
+        raise ValueError(f"GIT_EXE does not point to an executable Git installation: {override}")
+    executable = shutil.which("git")
+    if executable:
+        return executable
+    if os.name == "nt":
+        installs = [Path(os.environ[name]) / "Git/cmd/git.exe"
+                    for name in ("ProgramFiles", "ProgramFiles(x86)") if os.environ.get(name)]
+        if os.environ.get("LOCALAPPDATA"):
+            installs.append(Path(os.environ["LOCALAPPDATA"]) / "Programs/Git/cmd/git.exe")
+        for path in installs:
+            if path.is_file():
+                return str(path)
+    raise ValueError("Git is required for formal assignment commit checks but is not on PATH. "
+                     "Install Git or set GIT_EXE to the full path of git.exe, then retry.")
+
+
 def require_committed(*paths):
-    root = Path(subprocess.check_output(["git", "rev-parse", "--show-toplevel"], cwd=ROOT, text=True).strip()).resolve()
+    git = git_executable()
+    root = Path(subprocess.check_output([git, "rev-parse", "--show-toplevel"], cwd=ROOT, text=True).strip()).resolve()
     for path in paths:
         path = Path(path).resolve()
         rel = path.relative_to(root).as_posix()
         try:
-            old = subprocess.check_output(["git", "show", f"HEAD:{rel}"], cwd=ROOT, stderr=subprocess.PIPE)
+            old = subprocess.check_output([git, "show", f"HEAD:{rel}"], cwd=ROOT, stderr=subprocess.PIPE)
         except subprocess.CalledProcessError as exc:
             raise ValueError(f"Commit {rel} before collecting assignment measurements") from exc
         if old.replace(b"\r\n", b"\n") != path.read_bytes().replace(b"\r\n", b"\n"):
@@ -84,6 +110,15 @@ def require_test_commit():
         if "[TEAM TO COMPLETE]" in path.read_text(encoding="utf-8"):
             raise ValueError(f"Complete {path.name} before formal tests")
     require_committed(*paths)
+
+
+def verify_formal_inputs():
+    """Validate the dataset; Git history is submission evidence, not a runtime dependency."""
+    verify_split()
+    for name in ("predictions.md", "escalation_rule.md"):
+        path = ROOT / name
+        if not path.is_file() or "[TEAM TO COMPLETE]" in path.read_text(encoding="utf-8"):
+            print(f"Reminder: complete and commit {name} before collecting formal Assignment 2 results.", flush=True)
 
 
 def fixed_rows(name):

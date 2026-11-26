@@ -12,8 +12,8 @@ import uuid
 import requests
 
 from accuracy import read_logs, save_json, verify_service
-from data_tools import DATA, ROOT, fixed_rows, read_csv, require_committed, require_split_commit, require_test_commit, source_rows
-from model_config import MODEL_DIGESTS, generate_payload, parse_category
+from data_tools import DATA, ROOT, fixed_rows, read_csv, verify_formal_inputs, source_rows
+from model_config import MODEL_DIGESTS, generate_payload, parse_category, verify_installed_models
 
 
 def timing_parameters(s):
@@ -27,22 +27,25 @@ def timing_parameters(s):
 
 def warmup(args):
     # Run on SUT after restarting Ollama; direct identical prompts load both models.
-    require_split_commit()
+    # This is a model-residency preflight, not an accuracy or speed measurement.
+    # fixed_rows validates the frozen split and eligibility without needing Git.
     source, rows = source_rows(), fixed_rows("warmup")
-    require_committed(DATA / "warmup_rows.txt")
+    output = Path(args.output)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    if output.exists():
+        raise ValueError(f"Warm-up evidence already exists: {output}; select a new output file")
     host = args.ollama.rstrip("/")
     if len(set(args.model)) != len(args.model):
         raise ValueError("Duplicate model")
     tags = requests.get(host + "/api/tags", timeout=10)
     tags.raise_for_status()
     installed = {m["name"]: m["digest"] for m in tags.json()["models"]}
-    for model in args.model:
-        if installed.get(model) != MODEL_DIGESTS[model]:
-            raise ValueError(f"Assignment 1 digest mismatch for {model}")
+    verify_installed_models(installed, args.model)
     calls = []
     # Interleave to demonstrate residency instead of just loading one at a time.
     for row in rows:
         for model in args.model:
+            print(f"Warming {model} with row {row}...", flush=True)
             res = requests.post(host + "/api/generate", json=generate_payload(model, source[row]), timeout=args.timeout)
             res.raise_for_status()
             try:
@@ -66,8 +69,7 @@ def warmup(args):
 
 
 def calibrate(args):
-    require_test_commit()
-    require_committed(DATA / "calibration_rows.txt")
+    verify_formal_inputs()
     verify_service(args.url, args.model, args.run_id)
     source, rows = source_rows(), fixed_rows("calibration")
     timings = []
@@ -86,8 +88,7 @@ def calibrate(args):
 
 
 def run_jmeter(args):
-    require_test_commit()
-    require_committed(DATA / "workload_rows.txt", DATA / "speed_workload.csv", DATA / "warmup_rows.txt")
+    verify_formal_inputs()
     warm = json.loads(Path(args.warmup_evidence).read_text(encoding="utf-8"))
     if not warm.get("all_resident") or not warm.get("cpu_only") or args.model not in warm["models"]:
         raise ValueError("Run warm-up/residency check before starting JMeter")

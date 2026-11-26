@@ -13,29 +13,19 @@ git commit -m 'Freeze Assignment 2 golden tuning and test split'
 
 The two generated CSVs retain the 175 original labels. Odd **source row IDs** (the A1 `row` column, not physical CSV lines) form the tuning set (85); even source IDs form the test set (90). Both are sorted. If your lecturer explicitly intended sorted-list ordinal parity instead, resolve this interpretation before measuring.
 
-The workload is already prepared: 3 distinct typical-length warm-up tickets, 3 distinct calibration tickets, and 819 ordered non-golden speed tickets. Long tickets are interleaved in the fixed workload. No ticket overlaps any other set. The JMeter thread group uses a fixed random seed and a shared non-recycling CSV. Validate the actual sent row sequence across runs. The split and workload are checked by automated tests.
+The workload is already prepared: 3 distinct typical-length warm-up tickets, 3 distinct calibration tickets, and 819 ordered non-golden speed tickets. Long tickets are interleaved in the fixed workload. No ticket overlaps any other set. The JMeter thread group uses a fixed random seed and a shared non-recycling CSV. Validate the actual sent row sequence across runs. Python checks the actual dataset contents.
 
-Commit the remaining preparation files before running tuning, including workload lists. Do not stage generated test outputs until they exist.
-
-```powershell
-git add -- 'Assignment 2'
-git commit -m 'Add Assignment 2 cascade and reproducible test tooling'
-cd 'Assignment 2'
-python -m pip install -r requirements-dev.txt
-python -m unittest discover -s tests -v
-```
+Git commits are required by the assignment for evidence, not by the Python programs. If the split is already committed, this step is done. Use your Git client (including VS Code Source Control or GitHub Desktop) to commit the split, final predictions/rule and ordered workload as required by the brief. No Git installation or PATH configuration is needed to run the scripts.
 
 ## 2. Original Assignment 1 host: configure and check residency
 
-Before starting A2, find the original Ollama image digest and model volume using the A1 host's Docker inspection. Stop the A1 services (do not delete its volumes) if they are using ports 8000/11434. Set the exact original values in this PowerShell session:
+From `Assignment 2`, run the automatic setup (no manual image/volume environment variables or placeholders):
 
 ```powershell
-$env:OLLAMA_IMAGE = '<original Ollama image with digest>'
-$env:OLLAMA_VOLUME_NAME = '<original Ollama model volume name>'
-docker compose up -d ollama
+python setup_ollama.py
 ```
 
-Do not pull new model versions. Verify all three tags/digests, the original hardware allocation, and `docs/environment.md`. If the actual A1 setup had further limits/settings, reproduce them before testing. The service checks the recorded A1 model digests from `model_config.py` at startup.
+The setup reads A1's Compose configuration and recorded model digests (already in `model_config.py`). It locates any matching original model volume, including legacy project-folder names, and reuses the original local Ollama image when available. If the model cache was deleted, it automatically downloads the three recorded model tags into a dedicated A2 restored volume, leaving all existing A1 volumes untouched. If the Ollama image was deleted, it downloads the image tag from the A1 Compose file. No manual digest or volume-name entry is required. It stops only identified A1 containers if necessary to release their ports. All three downloaded/reused model digests must match before testing can proceed. The setup saves the actual image, Ollama version, model digests and whether recovery was needed in `results/ollama-setup-*.json`. If the original image version cannot be verified, disclose that limitation and rerun single-model accuracy rather than assuming A1 accuracy records can be reused. Verify the original hardware allocation and `docs/environment.md` before testing.
 
 **Check memory before choosing a pair.** Start a clean Ollama container, check the original A1 settings, then run:
 
@@ -52,11 +42,13 @@ This interleaves three fixed warm-up tickets for each model using the unchanged 
 Recover A1 per-ticket prediction CSVs for both models and verify unchanged digest, prompt, version, machine. The checked-in A1 1B CSV may be a development run; verify its provenance before reuse. If a record is unavailable or conditions changed, start each model on the original host and run a new tuning evaluation on the load generator, e.g.:
 
 ```powershell
-# SUT:
-.\start_config.ps1 -Model 'llama3.2:3b' -RunId 'tuning-3b'
-# Separate generator (with repo checkout):
-python accuracy.py run --split tuning --model llama3.2:3b --run-id tuning-3b --url http://SUT-IP:8000 --output results/tuning-3b
+python start_config.py --model llama3.2:3b --run-id tuning-3b
+python accuracy.py run --split tuning --model llama3.2:3b --run-id tuning-3b --output results/tuning-3b
+python start_config.py --model qwen2.5:7b --run-id tuning-7b
+python accuracy.py run --split tuning --model qwen2.5:7b --run-id tuning-7b --output results/tuning-7b
 ```
+
+These commands use localhost for tuning on the SUT. From a different computer, add `--url` followed by the actual service machine's HTTP URL; `SUT-IP` in older examples is not a literal hostname. The formal JMeter load generator must run on a separate machine. The Python launcher replaces `start_config.ps1` and waits until the correct model/run ID is ready on port 8000.
 
 Once tuning predictions for both selected models are available:
 
@@ -76,7 +68,7 @@ git commit -m 'Freeze escalation rule and Assignment 2 predictions before held-o
 For each single model and both chosen cascade settings, use a unique run ID. On SUT:
 
 ```powershell
-.\start_config.ps1 -Model qwen2.5:7b -RunId acc-qwen
+python start_config.py --model qwen2.5:7b --run-id acc-qwen
 ```
 
 On generator:
@@ -91,7 +83,7 @@ For a single model with verified unchanged A1 predictions, use `accuracy.py reus
 For a cascade, start it with the selected pair and list, for example syntax:
 
 ```powershell
-.\start_config.ps1 -Model llama3.2:3b -LargeModel qwen2.5:7b -Setting 1 -AcceptCategories '<team-selected pipe-separated categories>' -RunId acc-cascade1
+python start_config.py --model llama3.2:3b --large-model qwen2.5:7b --setting 1 --accept-categories '<team-selected pipe-separated categories>' --run-id acc-cascade1
 docker compose restart ollama
 python benchmark.py warmup --model llama3.2:3b --model qwen2.5:7b --output results/acc-cascade1-warmup.json
 ```

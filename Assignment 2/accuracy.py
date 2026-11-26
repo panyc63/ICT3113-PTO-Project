@@ -9,7 +9,7 @@ from collections import Counter
 import requests
 
 from categories import CATEGORIES
-from data_tools import (DATA, ROOT, labels, read_csv, require_split_commit, require_test_commit,
+from data_tools import (DATA, ROOT, labels, read_csv, verify_split, verify_formal_inputs,
                         source_rows, write_csv)
 from model_config import MODEL_DIGESTS, accept_categories, should_escalate
 
@@ -100,8 +100,14 @@ def attach_escalations(records, logs):
 
 
 def verify_service(url, model, run_id, timeout=10):
-    response = requests.get(url.rstrip("/") + "/stats", timeout=timeout)
-    response.raise_for_status()
+    if "sut-ip" in url.lower():
+        raise ValueError("SUT-IP is a placeholder. Omit --url for localhost or use the actual service host IP.")
+    try:
+        response = requests.get(url.rstrip("/") + "/stats", timeout=timeout)
+        response.raise_for_status()
+    except requests.RequestException as exc:
+        raise ValueError(f"Cannot connect to the triage service at {url}. Start it with "
+                         f"python start_config.py --model {model} --run-id {run_id}. Details: {exc}") from exc
     for key, value in {"X-Model-Name": model, "X-Model-Digest": MODEL_DIGESTS[model],
                        "X-Run-ID": run_id, "X-Output-Format": "category-json-v1"}.items():
         if response.headers.get(key) != value:
@@ -111,9 +117,9 @@ def verify_service(url, model, run_id, timeout=10):
 
 def run_accuracy(args):
     if args.split == "test":
-        require_test_commit()
+        verify_formal_inputs()
     else:
-        require_split_commit()
+        verify_split()
     verify_service(args.url, args.model, args.run_id)
     source, expected = source_rows(), split_labels(args.split)
     out = Path(args.output)
@@ -149,9 +155,9 @@ def run_accuracy(args):
 
 def reuse_accuracy(args):
     if args.split == "test":
-        require_test_commit()
+        verify_formal_inputs()
     else:
-        require_split_commit()
+        verify_split()
     records = subset_predictions(args.predictions, args.split)
     out = Path(args.output)
     out.mkdir(parents=True, exist_ok=False)
@@ -215,7 +221,7 @@ def main():
     run.add_argument("--split", choices=["tuning", "test"], required=True)
     run.add_argument("--model", choices=MODEL_DIGESTS, required=True)
     run.add_argument("--mode", choices=["single", "cascade"], default="single")
-    run.add_argument("--url", required=True)
+    run.add_argument("--url", default="http://127.0.0.1:8000", help="Triage service URL (default: local Docker service)")
     run.add_argument("--run-id", required=True)
     run.add_argument("--timeout", type=float, default=1300)
     run.add_argument("--output", required=True)
@@ -246,10 +252,10 @@ def main():
     elif args.command == "reuse":
         reuse_accuracy(args)
     elif args.command == "tune":
-        require_split_commit()
+        verify_split()
         save_json(args.output, tuning_analysis(args.small, args.large, [accept_categories(v) for v in args.accept]))
     elif args.command == "score":
-        require_test_commit() if args.split == "test" else require_split_commit()
+        verify_split()
         records = subset_predictions(args.predictions, args.split)
         if args.cascade_logs:
             attach_escalations(records, read_logs(args.cascade_logs))
@@ -257,9 +263,12 @@ def main():
         save_json(args.output, {"split": args.split, **report})
         print(json.dumps(report, indent=2))
     else:
-        require_test_commit()
+        verify_split()
         save_json(args.output, compare_reports(args.top, [value.split("=", 1) for value in args.config]))
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except (ValueError, OSError, requests.RequestException) as exc:
+        raise SystemExit(str(exc))

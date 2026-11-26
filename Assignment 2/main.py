@@ -15,7 +15,7 @@ import requests
 
 from categories import CATEGORIES
 from model_config import (MODEL_DIGESTS, OUTPUT_FORMAT, accept_categories, generate_payload,
-                          parse_category, should_escalate)
+                          parse_category, should_escalate, verify_installed_models)
 
 BASE_DIR = Path(__file__).resolve().parent
 DB_PATH = Path(os.getenv("DB_PATH", str(BASE_DIR / "runtime/tickets.db")))
@@ -75,9 +75,7 @@ def verify_configuration():
         response = requests.get(f"{OLLAMA_HOST}/api/tags", timeout=10)
         response.raise_for_status()
         installed = {m["name"]: m["digest"] for m in response.json()["models"]}
-        for model, digest in models.items():
-            if installed.get(model) != digest:
-                raise RuntimeError(f"Installed model does not match Assignment 1 digest: {model}")
+        verify_installed_models(installed, models)
 
 
 @asynccontextmanager
