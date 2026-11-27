@@ -30,9 +30,13 @@ Ticket Narrative:
 {narrative}"""
 
 
+def structured_payload(model, prompt, schema):
+    return {"model": model, "prompt": prompt, "stream": False,
+            "format": schema, "options": {"num_gpu": 0}, "keep_alive": -1}
+
+
 def generate_payload(model, narrative):
-    return {"model": model, "prompt": classification_prompt(narrative), "stream": False,
-            "format": CATEGORY_SCHEMA, "options": {"num_gpu": 0}, "keep_alive": -1}
+    return structured_payload(model, classification_prompt(narrative), CATEGORY_SCHEMA)
 
 
 def parse_category(value):

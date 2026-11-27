@@ -17,7 +17,9 @@ services:
       DB_PATH: /app/runtime/tickets.db
       LOG_PATH: /app/logs/${RUN_ID:-development}.jsonl
     volumes:
-      - ./logs:/app/logs
+      - type: bind
+        source: ${TRIAGE_LOG_DIR:-./logs}
+        target: /app/logs
     depends_on:
       ollama:
         condition: service_healthy

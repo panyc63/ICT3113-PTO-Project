@@ -28,6 +28,7 @@ def main():
     parser.add_argument("--setting", choices=["1", "2"])
     parser.add_argument("--accept-categories", default="")
     parser.add_argument("--model-timeout", type=int, default=600)
+    parser.add_argument("--log-dir", type=Path, default=ROOT / "logs", help="Host directory for the service audit log")
     args = parser.parse_args()
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]*", args.run_id):
         parser.error("Run ID must contain only letters, numbers, dots, underscores or hyphens")
@@ -46,7 +47,10 @@ def main():
                 "LARGE_MODEL_DIGEST": MODEL_DIGESTS.get(args.large_model, ""),
                 "CASCADE_SETTING": args.setting or "", "ACCEPT_CATEGORIES": args.accept_categories,
                 "RUN_ID": args.run_id, "MODEL_TIMEOUT": str(args.model_timeout)})
-    if (ROOT / "logs" / f"{args.run_id}.jsonl").exists():
+    log_dir = args.log_dir.resolve()
+    log_dir.mkdir(parents=True, exist_ok=True)
+    env["TRIAGE_LOG_DIR"] = log_dir.as_posix()
+    if (log_dir / f"{args.run_id}.jsonl").exists():
         print("Existing log will be preserved and appended to. Use a distinct run ID for each separate measured run.", flush=True)
     compose(env, "up", "-d", "--wait", "ollama")
     compose(env, "up", "-d", "--build", "--force-recreate", "--no-deps", "triage-service")

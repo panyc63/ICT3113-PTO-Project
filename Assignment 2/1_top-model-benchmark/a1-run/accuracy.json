@@ -1,0 +1,108 @@
+{
+  "count": 175,
+  "overall_accuracy": 0.8,
+  "error_count": 0,
+  "per_category": {
+    "Credit reporting": {
+      "support": 43,
+      "accuracy_recall": 0.7906976744186046
+    },
+    "Debt collection": {
+      "support": 25,
+      "accuracy_recall": 0.88
+    },
+    "Mortgage": {
+      "support": 23,
+      "accuracy_recall": 0.6521739130434783
+    },
+    "Credit card": {
+      "support": 18,
+      "accuracy_recall": 0.8333333333333334
+    },
+    "Bank account or service": {
+      "support": 37,
+      "accuracy_recall": 0.8648648648648649
+    },
+    "Consumer loan": {
+      "support": 14,
+      "accuracy_recall": 0.7857142857142857
+    },
+    "Money transfer or service": {
+      "support": 15,
+      "accuracy_recall": 0.7333333333333333
+    }
+  },
+  "confusion_matrix": {
+    "Credit reporting": {
+      "Credit reporting": 34,
+      "Debt collection": 5,
+      "Mortgage": 0,
+      "Credit card": 3,
+      "Bank account or service": 1,
+      "Consumer loan": 0,
+      "Money transfer or service": 0,
+      "ERROR": 0
+    },
+    "Debt collection": {
+      "Credit reporting": 1,
+      "Debt collection": 22,
+      "Mortgage": 1,
+      "Credit card": 0,
+      "Bank account or service": 1,
+      "Consumer loan": 0,
+      "Money transfer or service": 0,
+      "ERROR": 0
+    },
+    "Mortgage": {
+      "Credit reporting": 1,
+      "Debt collection": 0,
+      "Mortgage": 15,
+      "Credit card": 0,
+      "Bank account or service": 1,
+      "Consumer loan": 5,
+      "Money transfer or service": 1,
+      "ERROR": 0
+    },
+    "Credit card": {
+      "Credit reporting": 1,
+      "Debt collection": 0,
+      "Mortgage": 0,
+      "Credit card": 15,
+      "Bank account or service": 2,
+      "Consumer loan": 0,
+      "Money transfer or service": 0,
+      "ERROR": 0
+    },
+    "Bank account or service": {
+      "Credit reporting": 0,
+      "Debt collection": 0,
+      "Mortgage": 0,
+      "Credit card": 0,
+      "Bank account or service": 32,
+      "Consumer loan": 2,
+      "Money transfer or service": 3,
+      "ERROR": 0
+    },
+    "Consumer loan": {
+      "Credit reporting": 0,
+      "Debt collection": 0,
+      "Mortgage": 1,
+      "Credit card": 1,
+      "Bank account or service": 1,
+      "Consumer loan": 11,
+      "Money transfer or service": 0,
+      "ERROR": 0
+    },
+    "Money transfer or service": {
+      "Credit reporting": 0,
+      "Debt collection": 0,
+      "Mortgage": 0,
+      "Credit card": 0,
+      "Bank account or service": 4,
+      "Consumer loan": 0,
+      "Money transfer or service": 11,
+      "ERROR": 0
+    }
+  },
+  "confusion_matrix_orientation": "rows=human label, columns=prediction; errors count as incorrect"
+}

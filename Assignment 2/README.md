@@ -4,6 +4,8 @@ This directory implements the Assignment 2 cascade without modifying Assignment 
 
 ## 1. Freeze the split FIRST
 
+[Step 1 — Top model alone](1_top-model-benchmark/README.md) includes the Qwen accuracy runner, its output locations, and the original Assignment 1 benchmark. Run `python 1_top-model-benchmark/run_step1.py` on the service host to classify the 90 even-row tickets and log Qwen's confidence for each prediction.
+
 From the repository root (PowerShell):
 
 ```powershell
