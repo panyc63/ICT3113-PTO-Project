@@ -70,7 +70,7 @@ The analysis shows accuracy, confusion matrices, and **precision by each predict
 
 ## 3. Record predictions
 
-The team predicts that the 90% confidence setting will be the fastest qualifying configuration. The Step 3 record gives the forecasts for both settings, derives median latency from A1 ticket timings, and identifies the categories at risk. The worksheet requires the predictions and rule to be committed before the first A2 benchmark. The record states which measurements had already been collected. [Confidence cascade predictions](3_record-predictions/step3-report.md) · [Confidence rule](2_cascade-design/step2-report.md)
+The Step 3 report uses the Step 1 benchmarks and the Step 2 tuning replay to forecast the fastest qualifying configuration, both cascades’ performance, and the categories at risk. The worksheet requires the predictions and rule to be committed before the first A2 benchmark. [Confidence cascade predictions](3_record-predictions/step3-report.md) · [Confidence rule](2_cascade-design/step2-report.md)
 
 ```powershell
 git add -- 3_record-predictions/step3-report.md 2_cascade-design/step2-report.md predictions.md
