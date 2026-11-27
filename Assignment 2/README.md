@@ -29,7 +29,11 @@ The workload is already prepared: 3 distinct typical-length warm-up tickets, 3 d
 
 Git commits are required by the assignment for evidence, not by the Python programs. If the split is already committed, this step is done. Use your Git client (including VS Code Source Control or GitHub Desktop) to commit the split, final predictions/rule and ordered workload as required by the brief. No Git installation or PATH configuration is needed to run the scripts.
 
-## 2. Check model residency on the original Assignment 1 host
+## 2. Test each other Assignment 1 model alone
+
+Run `python 2_other-models-benchmark/run_step2.py` from `Assignment 2` to evaluate Llama 1B and Llama 3B individually against Qwen's overall and per-category accuracy limits. [Step 2 instructions and previous results](2_other-models-benchmark/README.md)
+
+### Check model residency before cascade tuning
 
 Complete [model setup](0_setup/README.md) and verify the original hardware allocation in [the environment record](docs/environment.md) before running this check.
 

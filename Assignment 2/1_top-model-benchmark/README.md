@@ -18,8 +18,8 @@ Each run gets a unique ID and writes these files inside this folder.
 |---|---|
 | `results/<run-id>/predictions.csv` | One row per ticket with its source row, request ID, reference and predicted categories, confidence, timings, and errors. |
 | `results/<run-id>/accuracy.json` | Overall and per-category scores, confusion matrix, accuracy floors, and confidence coverage. Written when all 90 tickets finish. |
-| `logs/<run-id>.tickets.jsonl` | One JSON object per ticket with the full narrative, `actual_category`, `predicted_category`, and `confidence`. The request ID links the entry to the service audit. |
-| `logs/<run-id>.jsonl` | Raw triage service audit, including Qwen's classification call and its duration. |
+| `logs/<run-id>/<run-id>.tickets.jsonl` | One JSON object per ticket with the full narrative, `actual_category`, `predicted_category`, and `confidence`. The request ID links the entry to the service audit. |
+| `logs/<run-id>/<run-id>.jsonl` | Raw triage service audit, including Qwen's classification call and its duration. |
 
 Confidence is Qwen's self-reported score. If the confidence call fails, the log records a null score and the reason, and the classification still counts. If classification fails, the ticket counts as incorrect and confidence is skipped. The separate confidence call is specific to this accuracy runner. Use the shared JMeter procedure for A2 speed measurements.
 
