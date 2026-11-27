@@ -16,13 +16,16 @@
 
 An absent or invalid score cannot satisfy the acceptance condition. The proposed fallback is to escalate and log the confidence error separately from a valid LOW score.
 
-## How the two settings will be evaluated
+## How did the two settings compare on the tuning set?
 
-Collect one Llama prediction and confidence score per ticket on the 85 odd-row tuning tickets. Apply both cutoffs to those same scores. Only tickets scoring **80–89** change route. Each such ticket saves one Qwen call under Setting 2. Compare Llama’s and Qwen’s answers on those tickets against the golden labels to see how the lower cutoff affects accuracy.
+We replayed both settings on the same **85 odd-row tuning tickets**. For each row, we took Llama’s saved category when its confidence met the cutoff and Qwen’s saved category otherwise. All 85 Llama scores were available. The golden label was used only to score the resulting answer. [Tuning labels](../data/golden_tuning.csv) · [Llama predictions and confidence](../1_accuracy-limits/results/step1-20261127T140752Z-14aa0cd1/tuning/llama-3b/predictions.csv) · [Qwen predictions](../1_accuracy-limits/results/step1-20261127T140752Z-14aa0cd1/tuning/qwen-7b/predictions.csv)
 
-For each setting, count accepted tickets, wrong accepted answers and escalations. Use Qwen’s prediction on escalated rows to estimate overall and per-category cascade accuracy.
+| Acceptance cutoff | Llama answers accepted | Wrong among accepted | Sent to Qwen | Replay right / wrong | Tuning accuracy |
+|---|---:|---:|---:|---:|---:|
+| Setting 1 · ≥90% | 37 | 8/37 | 48/85 (56.47%) | 73 / 12 | 85.88% |
+| Setting 2 · ≥80% | 61 | 15/61 | 24/85 (28.24%) | 69 / 16 | 81.18% |
 
-Step 1 supplies paired tuning predictions from Llama 3B and Qwen, including Llama’s self-reported confidence on each row. Use the 85 odd rows to evaluate the settings, then keep both cutoffs fixed for the held-out test. [Tuning rows](../data/golden_tuning.csv) · [Step 1 tuning evidence](../1_accuracy-limits/step1-report.md)
+Exactly **24 tickets** scored 80–89. Across those tickets, Qwen alone was correct on six and Llama alone was correct on two. Lowering the cutoff therefore saved **24 Qwen calls** at a cost of **four correct answers** in the replay. Bank account or service saw the largest loss, from 16/19 correct at 90% to 13/19 at 80%. The team will carry both cutoffs into the held-out test. End-to-end latency and test-set accuracy still require live cascade measurements.
 
 ## What the benchmark must capture
 
@@ -30,4 +33,4 @@ An accepted ticket incurs **two model calls** because Llama classifies the ticke
 
 The saved warm-up shows Llama 3B (2.6 GB) and Qwen 7B (5.1 GB) resident together on CPU after alternating requests in one Ollama container. Confirm both appear in `ollama ps` after warm-up for each formal cascade run. [Archived memory check](https://github.com/panyc63/ICT3113-PTO-Project/blob/d40dc5d8510f65da803e5ad490edba3de73655b9/Assignment%202/results/memory-3b-7b.json)
 
-**Implementation status.** The current API escalates by predicted category. The existing cascade predictions and results belong to that earlier rule. Implementing confidence routing inside `POST /tickets` and measuring the two settings are still pending. [Current API](../main.py) · [Earlier category-based rule](../escalation_rule.md) · [Earlier prediction record](../predictions.md)
+**Implementation status.** The current API escalates by predicted category. Confidence routing inside `POST /tickets` and live measurements for these two settings are pending. [Current API](../main.py) · [Earlier category-based rule](../escalation_rule.md) · [Step 3 confidence-cascade predictions](../3_record-predictions/step3-report.md)
