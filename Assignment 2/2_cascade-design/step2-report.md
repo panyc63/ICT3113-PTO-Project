@@ -5,7 +5,7 @@
 ## How one ticket is routed
 
 1. Inside `POST /tickets`, send the narrative to Llama 3.2 3B (`llama3.2:3b`) with the unchanged A1 classification prompt. Keep its predicted category.
-2. Ask **the same Llama model** in a separate call how confident it is in that category for this narrative. Request one integer from 0 to 100 using the existing standalone confidence prompt. The model sees the narrative and its prediction. Only the evaluator sees the golden label. [Confidence prompt and response schema](../single_model_benchmark.py)
+2. Ask **the same Llama model** in a separate call how confident it is in that category for this narrative. Request one integer from 0 to 100 using the existing standalone confidence prompt. The model sees the narrative and its prediction. Only the evaluator sees the golden label. [Shared confidence prompt and response schema](../model_config.py)
 3. Apply the cutoff below. For an escalation, send the original narrative to Qwen2.5 7B (`qwen2.5:7b`) with the A1 classification prompt. Return one final category.
 
 | Llama confidence | Setting 1 (90%) | Setting 2 (80%) |
@@ -33,4 +33,4 @@ An accepted ticket incurs **two model calls** because Llama classifies the ticke
 
 The saved warm-up shows Llama 3B (2.6 GB) and Qwen 7B (5.1 GB) resident together on CPU after alternating requests in one Ollama container. Confirm both appear in `ollama ps` after warm-up for each formal cascade run. [Archived memory check](https://github.com/panyc63/ICT3113-PTO-Project/blob/d40dc5d8510f65da803e5ad490edba3de73655b9/Assignment%202/results/memory-3b-7b.json)
 
-**Implementation status.** The current API escalates by predicted category. Confidence routing inside `POST /tickets` and live measurements for these two settings are pending. [Current API](../main.py) · [Earlier category-based rule](../escalation_rule.md) · [Step 3 confidence-cascade predictions](../3_record-predictions/step3-report.md)
+The API applies the selected confidence rule inside `POST /tickets`. Step 4-1 measures both cutoffs on the held-out tickets. [Current API](../main.py) · [Step 3 forecasts](../3_record-predictions/step3-report.md) · [Held-out accuracy report](../4-1_accuracy-tests/step4-1-report.md)

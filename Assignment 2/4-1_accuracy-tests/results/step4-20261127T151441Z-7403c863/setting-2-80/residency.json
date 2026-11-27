@@ -1,0 +1,101 @@
+{
+  "models": [
+    "llama3.2:3b",
+    "qwen2.5:7b"
+  ],
+  "warmup_calls": [
+    {
+      "row": 11769,
+      "model": "llama3.2:3b",
+      "category": "Credit reporting"
+    },
+    {
+      "row": 11769,
+      "model": "qwen2.5:7b",
+      "category": "Credit reporting"
+    },
+    {
+      "row": 11861,
+      "model": "llama3.2:3b",
+      "category": "Debt collection"
+    },
+    {
+      "row": 11861,
+      "model": "qwen2.5:7b",
+      "category": "Debt collection"
+    },
+    {
+      "row": 11580,
+      "model": "llama3.2:3b",
+      "category": "Debt collection"
+    },
+    {
+      "row": 11580,
+      "model": "qwen2.5:7b",
+      "category": "Money transfer or service"
+    }
+  ],
+  "ollama_ps": "NAME           ID              SIZE      PROCESSOR    CONTEXT    UNTIL   \nqwen2.5:7b     845dbda0ea48    5.1 GB    100% CPU     4096       Forever    \nllama3.2:3b    a80c4f17acd5    2.6 GB    100% CPU     4096       Forever    \nllama3.2:1b    baf6a787fdff    1.5 GB    100% CPU     4096       Forever    \n",
+  "ollama_ps_stderr": "",
+  "resident_models": [
+    {
+      "name": "qwen2.5:7b",
+      "model": "qwen2.5:7b",
+      "size": 5062566870,
+      "digest": "845dbda0ea48ed749caafd9e6037047aa19acfcfd82e704d7ca97d631a0b697e",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen2",
+        "families": [
+          "qwen2"
+        ],
+        "parameter_size": "7.6B",
+        "quantization_level": "Q4_K_M"
+      },
+      "expires_at": "2319-03-09T15:14:50.85107243Z",
+      "size_vram": 0,
+      "context_length": 4096
+    },
+    {
+      "name": "llama3.2:3b",
+      "model": "llama3.2:3b",
+      "size": 2561524365,
+      "digest": "a80c4f17acd55265feec403c7aef86be0c25983ab279d83f3bcd3abbcb5b8b72",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "llama",
+        "families": [
+          "llama"
+        ],
+        "parameter_size": "3.2B",
+        "quantization_level": "Q4_K_M"
+      },
+      "expires_at": "2319-03-09T15:14:49.412818062Z",
+      "size_vram": 0,
+      "context_length": 4096
+    },
+    {
+      "name": "llama3.2:1b",
+      "model": "llama3.2:1b",
+      "size": 1519292251,
+      "digest": "baf6a787fdffd633537aa2eb51cfd54cb93ff08e28040095462bb63daf552878",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "llama",
+        "families": [
+          "llama"
+        ],
+        "parameter_size": "1.2B",
+        "quantization_level": "Q8_0"
+      },
+      "expires_at": "2319-03-09T14:00:23.565720393Z",
+      "size_vram": 0,
+      "context_length": 4096
+    }
+  ],
+  "all_resident": true,
+  "cpu_only": true
+}

@@ -27,7 +27,9 @@ def main():
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--large-model", choices=MODEL_DIGESTS)
     parser.add_argument("--setting", choices=["1", "2"])
-    parser.add_argument("--accept-categories", default="")
+    rule = parser.add_mutually_exclusive_group()
+    rule.add_argument("--accept-categories", default="")
+    rule.add_argument("--confidence-threshold", type=int)
     parser.add_argument("--model-timeout", type=int, default=600)
     parser.add_argument("--log-dir", type=Path, default=ROOT / "logs", help="Host directory for the service audit log")
     args = parser.parse_args()
@@ -35,6 +37,8 @@ def main():
         parser.error("Run ID must contain only letters, numbers, dots, underscores or hyphens")
     if args.large_model and (args.large_model == args.model or not args.setting):
         parser.error("Cascade requires a distinct large model and --setting 1 or 2")
+    if args.confidence_threshold is not None and (not args.large_model or not 0 <= args.confidence_threshold <= 100):
+        parser.error("--confidence-threshold requires a cascade and an integer from 0 to 100")
     accept_categories(args.accept_categories)
     if args.model_timeout <= 0:
         parser.error("Model timeout must be positive")
@@ -48,6 +52,7 @@ def main():
                 "MODEL_DIGEST": MODEL_DIGESTS[args.model], "LARGE_MODEL": args.large_model or "",
                 "LARGE_MODEL_DIGEST": MODEL_DIGESTS.get(args.large_model, ""),
                 "CASCADE_SETTING": args.setting or "", "ACCEPT_CATEGORIES": args.accept_categories,
+                "CONFIDENCE_THRESHOLD": "" if args.confidence_threshold is None else str(args.confidence_threshold),
                 "RUN_ID": args.run_id, "MODEL_TIMEOUT": str(args.model_timeout)})
     log_dir = args.log_dir.resolve()
     log_dir.mkdir(parents=True, exist_ok=True)

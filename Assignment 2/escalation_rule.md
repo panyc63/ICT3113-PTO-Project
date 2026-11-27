@@ -1,4 +1,8 @@
-# Category-based cascade — Group P2-11
+# Escalation rule — Group P2-11
+
+The team selected Llama 3B’s self-reported confidence. Llama classifies each ticket and rates its prediction in a second call. Setting 1 accepts a score of at least 90 and Setting 2 accepts a score of at least 80. Lower or unavailable scores send the ticket to Qwen 7B. [Step 2 rule and tuning evidence](2_cascade-design/step2-report.md)
+
+## Earlier category-based cascade
 
 The two settings were selected using the 85 odd source rows in the frozen tuning set. Use the exact Assignment 1 prompt and category schema for every call. Both models must remain resident on the Assignment 1 CPU-only machine with the original CPU and RAM allocation.
 

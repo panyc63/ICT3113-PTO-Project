@@ -79,7 +79,7 @@ git commit -m 'Freeze escalation rule and Assignment 2 predictions before held-o
 
 ## 4. Test and measure
 
-- **4-1. Top model alone.** Run `python 4-1_top-model-benchmark/run_step4_1.py` to measure Qwen on the 90 test tickets. [Instructions](4-1_top-model-benchmark/README.md) · [Results](4-1_top-model-benchmark/step4-1-report.md)
+- **4-1. Held-out accuracy tests.** Reuse Qwen’s Step 1 test result. Run `python 4-1_accuracy-tests/run_step4_1.py` to measure both confidence cascades on the same 90 tickets. [Accuracy report](4-1_accuracy-tests/step4-1-report.md) · [Qwen reference](4-1_top-model-benchmark/step4-1-report.md)
 - **4-2. Other A1 models alone.** Run `python 4-2_other-models-benchmark/run_step4_2.py` to measure Llama 1B and 3B individually against the Step 1 limits. [Instructions](4-2_other-models-benchmark/README.md) · [Results](4-2_other-models-benchmark/step4-2-report.md)
 
 ### Held-out accuracy
@@ -99,15 +99,15 @@ python accuracy.py score --split test --predictions results/acc-qwen/predictions
 
 For a single model with verified unchanged A1 predictions, use `accuracy.py reuse --split test --model MODEL --predictions PATH --confirm-unchanged --output RESULTS_DIR`; then score. Reuse is not allowed for A1 speed data.
 
-For a cascade, start it with the selected pair and list, for example syntax:
+The Step 4-1 runner starts each confidence setting, warms both models, measures the held-out tickets and compares all eight accuracy limits. To launch one setting manually, use:
 
 ```powershell
-python start_config.py --model llama3.2:3b --large-model qwen2.5:7b --setting 1 --accept-categories '<team-selected pipe-separated categories>' --run-id acc-cascade1
+python start_config.py --model llama3.2:3b --large-model qwen2.5:7b --setting 1 --confidence-threshold 90 --run-id acc-cascade1
 docker compose restart ollama
 python benchmark.py warmup --model llama3.2:3b --model qwen2.5:7b --output results/acc-cascade1-warmup.json
 ```
 
-Run the actual accuracy evaluation with `--mode cascade --model llama3.2:3b --run-id acc-cascade1`. Copy the SUT's `logs/acc-cascade1.jsonl` to the generator, then score with `--cascade-logs logs/acc-cascade1.jsonl`. Repeat using setting 2 and its fixed acceptance list. Raw data include errors in the accuracy denominator.
+For a manual run, evaluate with `--mode cascade --model llama3.2:3b --run-id acc-cascade1` and score with the matching service audit. Setting 2 uses `--setting 2 --confidence-threshold 80`. Errors count as wrong in the accuracy denominator.
 
 Step 4-2 pairs each new Llama report with the latest completed Step 1 Qwen test run. For a later cascade comparison, pass that same test `accuracy.json` to `accuracy.py compare --top` and supply each new held-out report using `--config NAME=REPORT_JSON`. Use right and wrong counts alongside percentages, especially for Credit card, which has only seven test tickets.
 
