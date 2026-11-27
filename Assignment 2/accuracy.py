@@ -115,6 +115,27 @@ def verify_service(url, model, run_id, timeout=10):
     return sum(response.json().values())
 
 
+def classify_for_accuracy(url, model, run_id, row, narrative, actual, timeout):
+    request_id = str(uuid.uuid4())
+    status, predicted, error = 0, "ERROR", ""
+    start = time.perf_counter()
+    try:
+        response = requests.post(url.rstrip("/") + "/tickets", json={"narrative": narrative},
+                                 headers={"X-Request-ID": request_id, "X-Source-Row": str(row)}, timeout=timeout)
+        status = response.status_code
+        response.raise_for_status()
+        if response.headers.get("X-Run-ID") != run_id or response.headers.get("X-Model-Digest") != MODEL_DIGESTS[model]:
+            raise ValueError("Unexpected service identity")
+        category = response.json()["category"]
+        if category not in CATEGORIES:
+            raise ValueError("Invalid category")
+        predicted = category
+    except (requests.RequestException, ValueError, KeyError, TypeError) as exc:
+        error = str(exc)
+    return {"row": row, "request_id": request_id, "actual_category": actual, "predicted_category": predicted,
+            "status": status, "elapsed_ms": round((time.perf_counter() - start) * 1000, 3), "error": error}
+
+
 def run_accuracy(args):
     if args.split == "test":
         verify_formal_inputs()
@@ -131,26 +152,10 @@ def run_accuracy(args):
         writer = csv.DictWriter(f, fieldnames=FIELDS)
         writer.writeheader()
         for i, (row, actual) in enumerate(sorted(expected.items()), 1):
-            rid = str(uuid.uuid4())
-            start = time.perf_counter()
-            status, predicted, error = 0, "ERROR", ""
-            try:
-                res = requests.post(args.url.rstrip("/") + "/tickets", json={"narrative": source[row]},
-                                    headers={"X-Request-ID": rid, "X-Source-Row": str(row)}, timeout=args.timeout)
-                status = res.status_code
-                res.raise_for_status()
-                if res.headers.get("X-Run-ID") != args.run_id or res.headers.get("X-Model-Digest") != MODEL_DIGESTS[args.model]:
-                    raise ValueError("Unexpected service identity")
-                cat = res.json()["category"]
-                if cat not in CATEGORIES:
-                    raise ValueError("Invalid category")
-                predicted = cat
-            except (requests.RequestException, ValueError, KeyError, TypeError) as exc:
-                error = str(exc)
-            writer.writerow(dict(zip(FIELDS, [row, rid, actual, predicted, status,
-                                               round((time.perf_counter() - start) * 1000, 3), error])))
+            result = classify_for_accuracy(args.url, args.model, args.run_id, row, source[row], actual, args.timeout)
+            writer.writerow(result)
             f.flush()
-            print(f"{i}/{len(expected)} row={row} status={status}", flush=True)
+            print(f"{i}/{len(expected)} row={row} status={result['status']}", flush=True)
 
 
 def reuse_accuracy(args):
@@ -187,6 +192,12 @@ def tuning_analysis(small_path, large_path, accepted_lists):
             "small_model_precision_by_predicted_category": precision, "candidate_rules": trials}
 
 
+def accuracy_floors(top):
+    return {"overall": max(0, top["overall"]["accuracy_pct"] - 10),
+            "per_category": {category: max(0, item["accuracy_pct"] - 15) if item["count"] else None
+                             for category, item in top["per_category"].items()}}
+
+
 def compare_reports(top_path, configurations):
     def load(path):
         value = json.loads(Path(path).read_text(encoding="utf-8"))
@@ -194,9 +205,7 @@ def compare_reports(top_path, configurations):
             raise ValueError(f"Not a held-out test report: {path}")
         return value
     top = load(top_path)
-    floors = {"overall": max(0, top["overall"]["accuracy_pct"] - 10), "per_category": {}}
-    for category, item in top["per_category"].items():
-        floors["per_category"][category] = max(0, item["accuracy_pct"] - 15) if item["count"] else None
+    floors = accuracy_floors(top)
     results = []
     for name, path in configurations:
         report = load(path)

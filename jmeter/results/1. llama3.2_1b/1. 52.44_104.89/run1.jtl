@@ -1,0 +1,26 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1791542158431,5932,POST /tickets,200,OK,Tickets 1-1,text,true,,320,471,1,1,http://localhost:8000/tickets,5932,0,33
+1791542207855,34,GET /Search,200,OK,Search 2-1,text,true,,57660,134,1,1,http://localhost:8000/search?q=credit,34,0,2
+1791542217803,13,GET /Search,200,OK,Search 2-2,text,true,,57660,134,1,1,http://localhost:8000/search?q=credit,13,0,1
+1791542219610,3678,POST /tickets,200,OK,Tickets 1-2,text,true,,320,2249,1,1,http://localhost:8000/tickets,3677,0,1
+1791542234585,27,GET /Search,200,OK,Search 2-3,text,true,,59729,134,1,1,http://localhost:8000/search?q=credit,26,0,0
+1791542241626,10,GET /Search,200,OK,Search 2-4,text,true,,59729,134,1,1,http://localhost:8000/search?q=credit,10,0,1
+1791542312280,3721,POST /tickets,200,OK,Tickets 1-3,text,true,,320,2119,1,1,http://localhost:8000/tickets,3721,0,1
+1791542344330,2701,POST /tickets,200,OK,Tickets 1-4,text,true,,319,1520,1,1,http://localhost:8000/tickets,2701,0,2
+1791542350522,962,POST /tickets,200,OK,Tickets 1-5,text,true,,320,491,1,1,http://localhost:8000/tickets,962,0,1
+1791542357084,27,GET /Search,200,OK,Search 2-5,text,true,,60041,134,1,1,http://localhost:8000/search?q=credit,27,0,1
+1791542364922,919,POST /tickets,200,OK,Tickets 1-6,text,true,,320,482,1,1,http://localhost:8000/tickets,919,0,2
+1791542383274,14,GET /Search,200,OK,Search 2-6,text,true,,60041,134,1,1,http://localhost:8000/search?q=credit,13,0,2
+1791542440203,12,GET /Search,200,OK,Search 2-7,text,true,,60041,134,1,1,http://localhost:8000/search?q=credit,12,0,1
+1791542485073,10,GET /Search,200,OK,Search 2-8,text,true,,60041,134,1,1,http://localhost:8000/search?q=credit,10,0,1
+1791542489371,11,GET /Search,200,OK,Search 2-9,text,true,,60041,134,1,1,http://localhost:8000/search?q=credit,11,0,1
+1791542498244,9,GET /Search,200,OK,Search 2-10,text,true,,60041,134,1,1,http://localhost:8000/search?q=credit,9,0,1
+1791542503657,2662,POST /tickets,200,OK,Tickets 1-7,text,true,,319,1516,1,1,http://localhost:8000/tickets,2662,0,0
+1791542512190,29,GET /Search,200,OK,Search 2-11,text,true,,61376,134,1,1,http://localhost:8000/search?q=credit,29,0,1
+1791542555452,13,GET /Search,200,OK,Search 2-12,text,true,,61376,134,1,1,http://localhost:8000/search?q=credit,12,0,1
+1791542563470,9,GET /Search,200,OK,Search 2-13,text,true,,61376,134,1,1,http://localhost:8000/search?q=credit,9,0,1
+1791542604941,1758,POST /tickets,200,OK,Tickets 1-8,text,true,,320,954,1,1,http://localhost:8000/tickets,1757,0,1
+1791542685962,11,GET /Search,200,OK,Search 2-14,text,true,,61376,134,1,1,http://localhost:8000/search?q=credit,11,0,1
+1791542691157,10,GET /Search,200,OK,Search 2-15,text,true,,61376,134,1,1,http://localhost:8000/search?q=credit,10,0,1
+1791542692340,9,GET /Search,200,OK,Search 2-16,text,true,,61376,134,1,1,http://localhost:8000/search?q=credit,9,0,1
+1791542703271,12,GET /Search,200,OK,Search 2-17,text,true,,61376,134,1,1,http://localhost:8000/search?q=credit,12,0,2
