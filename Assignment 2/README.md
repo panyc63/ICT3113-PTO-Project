@@ -31,6 +31,8 @@ Git commits are required by the assignment for evidence, not by the Python progr
 
 ## 2. Design the cascade
 
+Group P2-11 selected two cutoffs for Llama 3B’s self-reported confidence. Setting 1 accepts scores of 90% or higher. Setting 2 accepts scores of 80% or higher. Both escalate lower scores to Qwen 7B. Tuning measurements on the 85 odd-row tickets are pending. [Step 2 confidence cascade design](2_cascade-design/step2-report.md)
+
 ### Check model residency before cascade tuning
 
 Complete [model setup](0_setup/README.md) and verify the original hardware allocation in [the environment record](docs/environment.md) before running this check.
@@ -45,7 +47,7 @@ python benchmark.py warmup --model llama3.2:3b --model qwen2.5:7b --output resul
 
 This interleaves three fixed warm-up tickets for each model using the unchanged prompt, records `ollama ps` and `/api/ps` evidence, and checks both models remain resident on CPU. It never changes memory allocation. A failed attempt should be saved; try `llama3.2:1b` + `qwen2.5:7b`, then `llama3.2:1b` + `llama3.2:3b` if necessary. If no pair fits, the brief allows reporting that evidence and testing singles instead.
 
-### Tune the chosen pair on the odd rows
+### Earlier category-based tuning procedure
 
 Recover A1 per-ticket prediction CSVs for both models and verify unchanged digest, prompt, version, machine. The checked-in A1 1B CSV may be a development run; verify its provenance before reuse. If a record is unavailable or conditions changed, start each model on the original host and run a new tuning evaluation on the load generator, e.g.:
 
@@ -68,10 +70,10 @@ The analysis shows accuracy, confusion matrices, and **precision by each predict
 
 ## 3. Record predictions
 
-Record the expected fastest qualifying configuration, the escalation fraction, accuracy and median latency for each cascade setting, and the categories expected to lose accuracy. The worksheet requires the predictions and rule to be committed before the first A2 benchmark. [Prediction record](predictions.md) · [Escalation rule](escalation_rule.md)
+The team predicts that the 90% confidence setting will be the fastest qualifying configuration. The Step 3 record gives the forecasts for both settings, derives median latency from A1 ticket timings, and identifies the categories at risk. The worksheet requires the predictions and rule to be committed before the first A2 benchmark. The record states which measurements had already been collected. [Confidence cascade predictions](3_record-predictions/step3-report.md) · [Confidence rule](2_cascade-design/step2-report.md)
 
 ```powershell
-git add -- predictions.md escalation_rule.md
+git add -- 3_record-predictions/step3-report.md 2_cascade-design/step2-report.md predictions.md
 git commit -m 'Freeze escalation rule and Assignment 2 predictions before held-out testing'
 ```
 

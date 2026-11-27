@@ -1,5 +1,9 @@
 # Assignment 2 predictions — Group P2-11
 
+The current Step 3 record covers the **90% and 80% self-reported confidence settings**. It contains the team's forecasts, the A1 latency derivation and the categories expected to lose accuracy. [Confidence cascade predictions](3_record-predictions/step3-report.md)
+
+## Earlier predictions for the category-based cascade
+
 These predictions use the 85-ticket tuning runs for Llama 3.2 3B and Qwen 2.5 7B. Both runs used the odd source rows from the frozen split. The 90 held-out tickets are reserved for the formal accuracy tests.
 
 - **Expected fastest qualifying configuration.** Qwen 2.5 7B alone. It scored 78/85 (91.76%) on tuning with a 6.49 s median request time. Llama 3.2 3B alone had a faster 2.80 s median, but its 59/85 (69.41%) tuning score was 22.35 percentage points below Qwen's. Both cascade settings send a majority of tickets to Qwen after a Llama call, so their predicted medians are higher than Qwen's. Llama 3.2 1B is expected to fall below the accuracy limits given its reported 38.9% accuracy in Assignment 1. Its qualification still needs to be checked on the held-out set.
