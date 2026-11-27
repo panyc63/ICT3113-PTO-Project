@@ -7,9 +7,11 @@ import subprocess
 import sys
 import requests
 
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
 from model_config import MODEL_DIGESTS, verify_installed_models
 
-ROOT = Path(__file__).resolve().parent
 A1 = ROOT.parent / "Assignment 1"
 ENV_FILE = ROOT / ".env"
 STATE_FILE = ROOT / ".ollama-reuse.json"

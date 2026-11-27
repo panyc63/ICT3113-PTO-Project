@@ -14,7 +14,7 @@ $pins = @{
     'qwen2.5:7b' = '845dbda0ea48ed749caafd9e6037047aa19acfcfd82e704d7ca97d631a0b697e'
 }
 if (-not (Test-Path -LiteralPath (Join-Path $PSScriptRoot '.ollama-reuse.json')) -or -not (Test-Path -LiteralPath (Join-Path $PSScriptRoot '.env'))) {
-    python setup_ollama.py
+    python (Join-Path $PSScriptRoot '0_setup/setup_ollama.py')
     if ($LASTEXITCODE -ne 0) { throw 'Could not locate the original Assignment 1 models. See the setup output.' }
 }
 if (Test-Path -LiteralPath (Join-Path $PSScriptRoot "logs/$RunId.jsonl")) { throw 'Run ID already used; select a new ID to preserve evidence.' }

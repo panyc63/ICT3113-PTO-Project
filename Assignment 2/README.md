@@ -2,6 +2,16 @@
 
 This directory implements the Assignment 2 cascade without modifying Assignment 1. It is a preparation/measurement toolkit, not a completed benchmark report. There are no fabricated accuracy or speed results. All formal measurements must run on the unchanged Assignment 1 service host, with a separate JMeter generator. The team owns the escalation choices, predictions, experiments and recommendation.
 
+## 0. Set up the models
+
+From `Assignment 2` on the service host, run
+
+```powershell
+python .\0_setup\setup_ollama.py
+```
+
+[Step 0 — Model setup](0_setup/README.md) explains how the script selects the Ollama image, prepares the model volume, and verifies the three Assignment 1 models.
+
 ## 1. Freeze the split FIRST
 
 [Step 1 — Top model alone](1_top-model-benchmark/README.md) includes the Qwen accuracy runner, its output locations, and the original Assignment 1 benchmark. Run `python 1_top-model-benchmark/run_step1.py` on the service host to classify the 90 even-row tickets and log Qwen's confidence for each prediction.
@@ -19,15 +29,9 @@ The workload is already prepared: 3 distinct typical-length warm-up tickets, 3 d
 
 Git commits are required by the assignment for evidence, not by the Python programs. If the split is already committed, this step is done. Use your Git client (including VS Code Source Control or GitHub Desktop) to commit the split, final predictions/rule and ordered workload as required by the brief. No Git installation or PATH configuration is needed to run the scripts.
 
-## 2. Original Assignment 1 host: configure and check residency
+## 2. Check model residency on the original Assignment 1 host
 
-From `Assignment 2`, run the automatic setup (no manual image/volume environment variables or placeholders):
-
-```powershell
-python setup_ollama.py
-```
-
-The setup reads A1's Compose configuration and recorded model digests (already in `model_config.py`). It locates any matching original model volume, including legacy project-folder names, and reuses the original local Ollama image when available. If the model cache was deleted, it automatically downloads the three recorded model tags into a dedicated A2 restored volume, leaving all existing A1 volumes untouched. If the Ollama image was deleted, it downloads the image tag from the A1 Compose file. No manual digest or volume-name entry is required. It stops only identified A1 containers if necessary to release their ports. All three downloaded/reused model digests must match before testing can proceed. The setup saves the actual image, Ollama version, model digests and whether recovery was needed in `results/ollama-setup-*.json`. If the original image version cannot be verified, disclose that limitation and rerun single-model accuracy rather than assuming A1 accuracy records can be reused. Verify the original hardware allocation and `docs/environment.md` before testing.
+Complete [model setup](0_setup/README.md) and verify the original hardware allocation in [the environment record](docs/environment.md) before running this check.
 
 **Check memory before choosing a pair.** Start a clean Ollama container, check the original A1 settings, then run:
 

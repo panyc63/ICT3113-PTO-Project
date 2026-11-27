@@ -11,7 +11,8 @@ import time
 import requests
 
 from model_config import MODEL_DIGESTS, accept_categories
-from setup_ollama import ROOT, STATE_FILE, ENV_FILE
+
+ROOT = Path(__file__).resolve().parent
 
 
 def compose(env, *args):
@@ -37,9 +38,10 @@ def main():
     accept_categories(args.accept_categories)
     if args.model_timeout <= 0:
         parser.error("Model timeout must be positive")
-    if not STATE_FILE.exists() or not ENV_FILE.exists():
-        subprocess.run([sys.executable, str(ROOT / "setup_ollama.py")], cwd=ROOT, check=True)
-    state = json.loads(STATE_FILE.read_text(encoding="utf-8"))
+    state_file = ROOT / ".ollama-reuse.json"
+    if not state_file.exists() or not (ROOT / ".env").exists():
+        subprocess.run([sys.executable, str(ROOT / "0_setup" / "setup_ollama.py")], cwd=ROOT, check=True)
+    state = json.loads(state_file.read_text(encoding="utf-8"))
     env = os.environ.copy()
     env.update({"A2_OLLAMA_IMAGE": state["image"], "A2_OLLAMA_VOLUME_NAME": state["volume"],
                 "MODE": "cascade" if args.large_model else "single", "MODEL_NAME": args.model,
