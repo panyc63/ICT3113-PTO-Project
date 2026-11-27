@@ -1,9 +1,11 @@
+name: ict3113-assignment2
+
 include:
   - path: ./0_setup/ollama.compose.yml
     project_directory: .
 
 services:
-  triage-service:
+  api:
     build: .
     ports:
       - "8000:8000"

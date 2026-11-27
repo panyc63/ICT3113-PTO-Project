@@ -55,7 +55,7 @@ def main():
     if (log_dir / f"{args.run_id}.jsonl").exists():
         print("Existing log will be preserved and appended to. Use a distinct run ID for each separate measured run.", flush=True)
     compose(env, "up", "-d", "--wait", "ollama")
-    compose(env, "up", "-d", "--build", "--force-recreate", "--no-deps", "triage-service")
+    compose(env, "up", "-d", "--build", "--force-recreate", "--no-deps", "api")
     print("Waiting for the triage service on http://127.0.0.1:8000 ...", flush=True)
     expected = {"X-Model-Name": args.model, "X-Model-Digest": MODEL_DIGESTS[args.model], "X-Run-ID": args.run_id}
     deadline = time.monotonic() + 60
@@ -71,7 +71,7 @@ def main():
         except requests.RequestException as exc:
             last_error = str(exc)
         time.sleep(1)
-    compose(env, "logs", "--tail", "60", "triage-service")
+    compose(env, "logs", "--tail", "60", "api")
     raise RuntimeError(f"Triage service did not become ready: {last_error}")
 
 

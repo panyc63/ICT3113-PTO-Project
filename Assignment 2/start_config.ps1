@@ -28,6 +28,6 @@ $env:CASCADE_SETTING = $Setting
 $env:ACCEPT_CATEGORIES = $AcceptCategories
 $env:RUN_ID = $RunId
 $env:MODEL_TIMEOUT = "$ModelTimeout"
-docker compose up -d --build --force-recreate triage-service
+docker compose up -d --build --force-recreate api
 if ($LASTEXITCODE -ne 0) { throw 'Docker Compose could not start the configuration.' }
 docker compose ps

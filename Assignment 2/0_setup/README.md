@@ -10,4 +10,4 @@ The script prepares `llama3.2:1b`, `llama3.2:3b`, and `qwen2.5:7b`. It looks for
 
 Setup checks all three installed model digests against the [A1 model pins](../model_config.py). It writes its image and volume choices to `Assignment 2/.env`, its launcher state to `Assignment 2/.ollama-reuse.json`, and evidence of the image, Ollama version, digests, and cache recovery to `Assignment 2/results/ollama-setup-*.json`. If the original Ollama version cannot be verified, record that limitation and rerun single-model accuracy before using the results.
 
-The [Ollama Compose configuration](ollama.compose.yml) defines the CPU-only service and persistent model volume. The [A2 Compose file](../docker-compose.yml) includes it for every benchmark step. To inspect the resolved configuration from this folder, run `docker compose config`.
+The [A2 Compose file](../docker-compose.yml) groups the `ollama` and `api` services under `ict3113-assignment2` in Docker Desktop. The [Ollama configuration](ollama.compose.yml) defines the CPU-only service and persistent model volume. To inspect the resolved configuration from this folder, run `docker compose config`.
