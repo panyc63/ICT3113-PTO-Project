@@ -22,12 +22,12 @@ Collect one Llama prediction and confidence score per ticket on the 85 odd-row t
 
 For each setting, count accepted tickets, wrong accepted answers and escalations. Use Qwen’s prediction on escalated rows to estimate overall and per-category cascade accuracy.
 
-The saved odd-row files contain both models’ categories and classification timings. Llama’s tuning file has no confidence column, so confidence still needs to be collected on those rows. Freeze both settings before measuring this rule on the 90 even-row test tickets. [Tuning rows](../data/golden_tuning.csv) · [Llama tuning predictions](../results/tuning-3b/predictions.csv) · [Qwen tuning predictions](../results/tuning-7b/predictions.csv)
+Step 1 supplies paired tuning predictions from Llama 3B and Qwen, including Llama’s self-reported confidence on each row. Use the 85 odd rows to evaluate the settings, then keep both cutoffs fixed for the held-out test. [Tuning rows](../data/golden_tuning.csv) · [Step 1 tuning evidence](../1_accuracy-limits/step1-report.md)
 
 ## What the benchmark must capture
 
 An accepted ticket incurs **two model calls** because Llama classifies the ticket and then rates its confidence. An escalated ticket incurs **three**, adding Qwen classification. Include the confidence call in end-to-end latency for both routes. For each ticket, log the request ID, setting and cutoff, Llama category and score, escalation decision and reason, final model and category, and each call’s duration. This lets the team check both the cost of escalation and the accuracy of accepted answers.
 
-The saved warm-up shows Llama 3B (2.6 GB) and Qwen 7B (5.1 GB) resident together on CPU after alternating requests in one Ollama container. Confirm both appear in `ollama ps` after warm-up for each formal cascade run. [Memory check](../results/memory-3b-7b.json)
+The saved warm-up shows Llama 3B (2.6 GB) and Qwen 7B (5.1 GB) resident together on CPU after alternating requests in one Ollama container. Confirm both appear in `ollama ps` after warm-up for each formal cascade run. [Archived memory check](https://github.com/panyc63/ICT3113-PTO-Project/blob/d40dc5d8510f65da803e5ad490edba3de73655b9/Assignment%202/results/memory-3b-7b.json)
 
 **Implementation status.** The current API escalates by predicted category. The existing cascade predictions and results belong to that earlier rule. Implementing confidence routing inside `POST /tickets` and measuring the two settings are still pending. [Current API](../main.py) · [Earlier category-based rule](../escalation_rule.md) · [Earlier prediction record](../predictions.md)

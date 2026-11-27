@@ -14,7 +14,7 @@ python .\0_setup\setup_ollama.py
 
 ## 1. Define the accuracy limits
 
-Step 1 uses the archived A1 Qwen predictions on the frozen even rows. Qwen scored 63/90 (70.00%), giving an overall floor of 54/90 (60.00%). The report gives the seven category floors, source files, reproduction command and reuse conditions. [Step 1 report](1_accuracy-limits/step1-report.md)
+Run `python 1_accuracy-limits/run_step1.py` from `Assignment 2`. Llama 1B, Llama 3B and Qwen 7B each classify the same 85 odd-row tuning tickets. Qwen then classifies the 90 even-row test tickets in a separate run. Its test result of 64/90 (71.11%) sets the overall floor at 55/90 (61.11%). Its seven test-category scores set the category floors. [Step 1 report](1_accuracy-limits/step1-report.md)
 
 From the repository root (PowerShell):
 
@@ -31,7 +31,7 @@ Git commits are required by the assignment for evidence, not by the Python progr
 
 ## 2. Design the cascade
 
-Group P2-11 selected two cutoffs for Llama 3B’s self-reported confidence. Setting 1 accepts scores of 90% or higher. Setting 2 accepts scores of 80% or higher. Both escalate lower scores to Qwen 7B. Tuning measurements on the 85 odd-row tickets are pending. [Step 2 confidence cascade design](2_cascade-design/step2-report.md)
+Group P2-11 selected two cutoffs for Llama 3B’s self-reported confidence. Setting 1 accepts scores of 90% or higher. Setting 2 accepts scores of 80% or higher. Both escalate lower scores to Qwen 7B. Step 1 collects the categories and confidence scores needed to compare these settings on the 85 odd-row tickets. [Step 2 confidence cascade design](2_cascade-design/step2-report.md)
 
 ### Check model residency before cascade tuning
 
@@ -109,13 +109,7 @@ python benchmark.py warmup --model llama3.2:3b --model qwen2.5:7b --output resul
 
 Run the actual accuracy evaluation with `--mode cascade --model llama3.2:3b --run-id acc-cascade1`. Copy the SUT's `logs/acc-cascade1.jsonl` to the generator, then score with `--cascade-logs logs/acc-cascade1.jsonl`. Repeat using setting 2 and its fixed acceptance list. Raw data include errors in the accuracy denominator.
 
-To compare the saved A2 results to the Step 1 limits, run the following from `Assignment 2` with an unused output filename.
-
-```powershell
-python accuracy.py compare --top 1_accuracy-limits/a2-test-rows/accuracy.json --config 'Qwen=4-1_top-model-benchmark/results/qwen-20261127T113825Z-3a6842ff/accuracy.json' --config 'Llama1B=4-2_other-models-benchmark/results/step2-20261127T125523Z-624d7491/llama-1b/accuracy.json' --config 'Llama3B=4-2_other-models-benchmark/results/step2-20261127T125523Z-624d7491/llama-3b/accuracy.json' --config 'Cascade1=results/acc-cascade1/accuracy.json' --config 'Cascade2=results/acc-cascade2/accuracy.json' --output results/comparison-step1.json
-```
-
-This derives the overall floor from Qwen's test accuracy minus 10 percentage points, each category floor minus 15 points, and qualifies configurations using both. Small category supports must be disclosed (Credit card has seven test tickets).
+Step 4-2 pairs each new Llama report with the latest completed Step 1 Qwen test run. For a later cascade comparison, pass that same test `accuracy.json` to `accuracy.py compare --top` and supply each new held-out report using `--config NAME=REPORT_JSON`. Use right and wrong counts alongside percentages, especially for Credit card, which has only seven test tickets.
 
 ### Calibrate and speed-test (three runs per configuration)
 

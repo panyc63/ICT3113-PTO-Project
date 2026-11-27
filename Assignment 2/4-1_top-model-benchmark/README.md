@@ -1,6 +1,6 @@
 # Step 4-1 — Top model alone
 
-This benchmark measures Qwen2.5 7B alone on the 90 even-row A2 test tickets. The saved run scored 62/90 and passes the A1-derived limits. [Step 4-1 results](step4-1-report.md) · [Step 1 accuracy limits and A1 evidence](../1_accuracy-limits/step1-report.md)
+This benchmark measures Qwen2.5 7B alone on the 90 even-row A2 test tickets. Step 1 runs this configuration to set the limits and provides the standalone reference for Step 4. The runner below can collect a separate repetition. [Step 4-1 status](step4-1-report.md) · [Step 1 accuracy limits](../1_accuracy-limits/step1-report.md)
 
 ## Run Qwen on the test tickets
 

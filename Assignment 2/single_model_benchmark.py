@@ -1,4 +1,4 @@
-"""Measure one pinned A1 model on the held-out tickets and record its confidence."""
+"""Measure a pinned A1 model on a frozen split and record its confidence."""
 import csv
 from datetime import datetime, timezone
 import json
@@ -45,10 +45,10 @@ def ask_confidence(ollama_url, model, narrative, prediction):
     return score
 
 
-def measure(model, run_id, result_dir, ticket_log):
+def measure(model, run_id, result_dir, ticket_log, *, split="test"):
     verify_service(SERVICE_URL, model, run_id)
     narratives = source_rows()
-    labels = split_labels("test")
+    labels = split_labels(split)
     records = []
     with ticket_log.open("x", encoding="utf-8") as log, (result_dir / "predictions.csv").open(
             "x", encoding="utf-8", newline="") as predictions:
@@ -75,10 +75,10 @@ def measure(model, run_id, result_dir, ticket_log):
                   f"confidence={record['confidence']}", flush=True)
 
     report = accuracy_metrics(records)
-    report.update(split="test", mode="single", model=model, digest=MODEL_DIGESTS[model], run_id=run_id,
+    report.update(split=split, mode="single", model=model, digest=MODEL_DIGESTS[model], run_id=run_id,
                   tickets_with_confidence=sum(r["confidence"] is not None for r in records),
                   confidence_errors=sum(bool(r["confidence_error"]) for r in records))
-    if model == TOP_MODEL:
+    if model == TOP_MODEL and split == "test":
         report["accuracy_floors_pct"] = accuracy_floors(report)
     save_json(result_dir / "accuracy.json", report)
     return report
@@ -89,14 +89,14 @@ def new_run_id(prefix):
     return f"{prefix}-{stamp}-{uuid.uuid4().hex[:8]}"
 
 
-def run_single_model(model, run_id, result_dir, log_dir):
+def run_single_model(model, run_id, result_dir, log_dir, *, split="test"):
     log_dir.mkdir(parents=True, exist_ok=False)
     subprocess.run([sys.executable, str(ROOT / "start_config.py"), "--model", model,
                     "--run-id", run_id, "--log-dir", str(log_dir)], check=True)
     result_dir.mkdir(parents=True, exist_ok=False)
     ticket_log = log_dir / f"{run_id}.tickets.jsonl"
     print(f"Results: {result_dir}\nTicket log: {ticket_log}", flush=True)
-    report = measure(model, run_id, result_dir, ticket_log)
+    report = measure(model, run_id, result_dir, ticket_log, split=split)
     overall = report["overall"]
     print(f"{model} classified {overall['correct']}/{overall['count']} correctly "
           f"({overall['accuracy_pct']:.2f}%). Confidence scores: "

@@ -1,0 +1,133 @@
+{
+  "overall": {
+    "correct": 78,
+    "wrong": 7,
+    "count": 85,
+    "accuracy_pct": 91.76470588235294
+  },
+  "per_category": {
+    "Credit reporting": {
+      "correct": 20,
+      "wrong": 3,
+      "count": 23,
+      "accuracy_pct": 86.95652173913044
+    },
+    "Debt collection": {
+      "correct": 12,
+      "wrong": 0,
+      "count": 12,
+      "accuracy_pct": 100.0
+    },
+    "Mortgage": {
+      "correct": 9,
+      "wrong": 3,
+      "count": 12,
+      "accuracy_pct": 75.0
+    },
+    "Credit card": {
+      "correct": 11,
+      "wrong": 0,
+      "count": 11,
+      "accuracy_pct": 100.0
+    },
+    "Bank account or service": {
+      "correct": 19,
+      "wrong": 0,
+      "count": 19,
+      "accuracy_pct": 100.0
+    },
+    "Consumer loan": {
+      "correct": 3,
+      "wrong": 1,
+      "count": 4,
+      "accuracy_pct": 75.0
+    },
+    "Money transfer or service": {
+      "correct": 4,
+      "wrong": 0,
+      "count": 4,
+      "accuracy_pct": 100.0
+    }
+  },
+  "confusion_matrix": {
+    "Credit reporting": {
+      "Credit reporting": 20,
+      "Debt collection": 1,
+      "Mortgage": 0,
+      "Credit card": 1,
+      "Bank account or service": 1,
+      "Consumer loan": 0,
+      "Money transfer or service": 0,
+      "ERROR": 0
+    },
+    "Debt collection": {
+      "Credit reporting": 0,
+      "Debt collection": 12,
+      "Mortgage": 0,
+      "Credit card": 0,
+      "Bank account or service": 0,
+      "Consumer loan": 0,
+      "Money transfer or service": 0,
+      "ERROR": 0
+    },
+    "Mortgage": {
+      "Credit reporting": 0,
+      "Debt collection": 0,
+      "Mortgage": 9,
+      "Credit card": 0,
+      "Bank account or service": 0,
+      "Consumer loan": 3,
+      "Money transfer or service": 0,
+      "ERROR": 0
+    },
+    "Credit card": {
+      "Credit reporting": 0,
+      "Debt collection": 0,
+      "Mortgage": 0,
+      "Credit card": 11,
+      "Bank account or service": 0,
+      "Consumer loan": 0,
+      "Money transfer or service": 0,
+      "ERROR": 0
+    },
+    "Bank account or service": {
+      "Credit reporting": 0,
+      "Debt collection": 0,
+      "Mortgage": 0,
+      "Credit card": 0,
+      "Bank account or service": 19,
+      "Consumer loan": 0,
+      "Money transfer or service": 0,
+      "ERROR": 0
+    },
+    "Consumer loan": {
+      "Credit reporting": 0,
+      "Debt collection": 0,
+      "Mortgage": 0,
+      "Credit card": 0,
+      "Bank account or service": 1,
+      "Consumer loan": 3,
+      "Money transfer or service": 0,
+      "ERROR": 0
+    },
+    "Money transfer or service": {
+      "Credit reporting": 0,
+      "Debt collection": 0,
+      "Mortgage": 0,
+      "Credit card": 0,
+      "Bank account or service": 0,
+      "Consumer loan": 0,
+      "Money transfer or service": 4,
+      "ERROR": 0
+    }
+  },
+  "matrix_orientation": "rows=true, columns=prediction",
+  "errors": 0,
+  "split": "tuning",
+  "mode": "single",
+  "model": "qwen2.5:7b",
+  "digest": "845dbda0ea48ed749caafd9e6037047aa19acfcfd82e704d7ca97d631a0b697e",
+  "run_id": "step1-20261127T140752Z-14aa0cd1-tuning-qwen-7b",
+  "tickets_with_confidence": 85,
+  "confidence_errors": 0
+}
