@@ -1,10 +1,18 @@
 {
   "top_model": {
+    "split": "test",
+    "model": "qwen2.5:7b",
+    "digest": "845dbda0ea48ed749caafd9e6037047aa19acfcfd82e704d7ca97d631a0b697e",
+    "run_id": "qwen25-7b-accuracy-01",
+    "source_run": "qwen25-7b-accuracy-01",
+    "source_predictions": "../a1-run/predictions.csv",
+    "measurement": "Rescored saved Assignment 1 predictions",
+    "formal_reuse_status": "A1 machine and Ollama version still require confirmation",
     "overall": {
-      "correct": 62,
-      "wrong": 28,
+      "correct": 63,
+      "wrong": 27,
       "count": 90,
-      "accuracy_pct": 68.88888888888889
+      "accuracy_pct": 70.0
     },
     "per_category": {
       "Credit reporting": {
@@ -44,10 +52,10 @@
         "accuracy_pct": 80.0
       },
       "Money transfer or service": {
-        "correct": 6,
-        "wrong": 5,
+        "correct": 7,
+        "wrong": 4,
         "count": 11,
-        "accuracy_pct": 54.54545454545455
+        "accuracy_pct": 63.63636363636363
       }
     },
     "confusion_matrix": {
@@ -86,9 +94,9 @@
         "Debt collection": 0,
         "Mortgage": 0,
         "Credit card": 4,
-        "Bank account or service": 1,
+        "Bank account or service": 2,
         "Consumer loan": 0,
-        "Money transfer or service": 1,
+        "Money transfer or service": 0,
         "ERROR": 0
       },
       "Bank account or service": {
@@ -116,20 +124,16 @@
         "Debt collection": 0,
         "Mortgage": 0,
         "Credit card": 0,
-        "Bank account or service": 5,
+        "Bank account or service": 4,
         "Consumer loan": 0,
-        "Money transfer or service": 6,
+        "Money transfer or service": 7,
         "ERROR": 0
       }
     },
     "matrix_orientation": "rows=true, columns=prediction",
     "errors": 0,
-    "split": "test",
-    "model": "qwen2.5:7b",
-    "digest": "845dbda0ea48ed749caafd9e6037047aa19acfcfd82e704d7ca97d631a0b697e",
-    "run_id": "qwen-20261127T113825Z-3a6842ff",
     "accuracy_floors_pct": {
-      "overall": 58.888888888888886,
+      "overall": 60.0,
       "per_category": {
         "Credit reporting": 55.0,
         "Debt collection": 61.92307692307692,
@@ -137,14 +141,12 @@
         "Credit card": 42.142857142857146,
         "Bank account or service": 57.22222222222223,
         "Consumer loan": 65.0,
-        "Money transfer or service": 39.54545454545455
+        "Money transfer or service": 48.63636363636363
       }
-    },
-    "tickets_with_confidence": 90,
-    "confidence_errors": 0
+    }
   },
   "floors_pct": {
-    "overall": 58.888888888888886,
+    "overall": 60.0,
     "per_category": {
       "Credit reporting": 55.0,
       "Debt collection": 61.92307692307692,
@@ -152,7 +154,7 @@
       "Credit card": 42.142857142857146,
       "Bank account or service": 57.22222222222223,
       "Consumer loan": 65.0,
-      "Money transfer or service": 39.54545454545455
+      "Money transfer or service": 48.63636363636363
     }
   },
   "configurations": [
@@ -451,6 +453,6 @@
       }
     }
   ],
-  "baseline_run_id": "qwen-20261127T113825Z-3a6842ff",
-  "baseline_report": "1_top-model-benchmark/results/qwen-20261127T113825Z-3a6842ff/accuracy.json"
+  "baseline_run_id": "qwen25-7b-accuracy-01",
+  "baseline_report": "1_accuracy-limits/a2-test-rows/accuracy.json"
 }

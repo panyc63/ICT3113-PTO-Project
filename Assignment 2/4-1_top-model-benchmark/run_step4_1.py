@@ -1,4 +1,4 @@
-"""Run the Step 1 Qwen baseline on the frozen even-row test tickets."""
+"""Run the Step 4-1 Qwen benchmark on the frozen even-row test tickets."""
 import argparse
 from pathlib import Path
 import subprocess

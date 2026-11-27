@@ -20,8 +20,7 @@ CANDIDATES = {"llama3.2:1b": "llama-1b", "llama3.2:3b": "llama-3b"}
 
 def qwen_baseline(path):
     if path is None:
-        runs = sorted((ROOT / "1_top-model-benchmark" / "results").glob("qwen-*/accuracy.json"))
-        path = runs[-1] if runs else ROOT / "results" / "acc-qwen" / "accuracy.json"
+        path = ROOT / "1_accuracy-limits" / "a2-test-rows" / "accuracy.json"
     path = path.resolve()
     report = json.loads(path.read_text(encoding="utf-8"))
     # Older accuracy runs store the model identity in a separate metadata file.
@@ -40,13 +39,13 @@ def qwen_baseline(path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model", choices=CANDIDATES, help="Run one candidate; the default runs both in order.")
-    parser.add_argument("--baseline", type=Path, help="Path to the Qwen test accuracy.json from the matching setup.")
+    parser.add_argument("--baseline", type=Path, help="Override the Step 1 A1-derived Qwen test report.")
     args = parser.parse_args()
     verify_formal_inputs()
     baseline, qwen_run_id = qwen_baseline(args.baseline)
     print(f"Qwen baseline: {baseline} (run {qwen_run_id})", flush=True)
 
-    batch = new_run_id("step2")
+    batch = new_run_id("step4-2")
     results = STEP_DIR / "results" / batch
     results.mkdir(parents=True, exist_ok=False)
     reports = []

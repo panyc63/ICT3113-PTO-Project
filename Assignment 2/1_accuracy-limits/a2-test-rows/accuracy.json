@@ -1,6 +1,8 @@
 {
   "split": "test",
   "model": "qwen2.5:7b",
+  "digest": "845dbda0ea48ed749caafd9e6037047aa19acfcfd82e704d7ca97d631a0b697e",
+  "run_id": "qwen25-7b-accuracy-01",
   "source_run": "qwen25-7b-accuracy-01",
   "source_predictions": "../a1-run/predictions.csv",
   "measurement": "Rescored saved Assignment 1 predictions",

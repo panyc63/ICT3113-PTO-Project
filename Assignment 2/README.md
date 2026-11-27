@@ -12,9 +12,9 @@ python .\0_setup\setup_ollama.py
 
 [Step 0 — Model setup](0_setup/README.md) explains how the script selects the Ollama image, prepares the model volume, and verifies the three Assignment 1 models.
 
-## 1. Freeze the split FIRST
+## 1. Define the accuracy limits
 
-[Step 1 — Top model alone](1_top-model-benchmark/README.md) includes the Qwen accuracy runner, its output locations, and the original Assignment 1 benchmark. Run `python 1_top-model-benchmark/run_step1.py` on the service host to classify the 90 even-row tickets and log Qwen's confidence for each prediction.
+Step 1 uses the archived A1 Qwen predictions on the frozen even rows. Qwen scored 63/90 (70.00%), giving an overall floor of 54/90 (60.00%). The report gives the seven category floors, source files, reproduction command and reuse conditions. [Step 1 report](1_accuracy-limits/step1-report.md)
 
 From the repository root (PowerShell):
 
@@ -29,9 +29,7 @@ The workload is already prepared: 3 distinct typical-length warm-up tickets, 3 d
 
 Git commits are required by the assignment for evidence, not by the Python programs. If the split is already committed, this step is done. Use your Git client (including VS Code Source Control or GitHub Desktop) to commit the split, final predictions/rule and ordered workload as required by the brief. No Git installation or PATH configuration is needed to run the scripts.
 
-## 2. Test each other Assignment 1 model alone
-
-Run `python 2_other-models-benchmark/run_step2.py` from `Assignment 2` to evaluate Llama 1B and Llama 3B individually against Qwen's overall and per-category accuracy limits. [Step 2 instructions and previous results](2_other-models-benchmark/README.md)
+## 2. Design the cascade
 
 ### Check model residency before cascade tuning
 
@@ -47,7 +45,7 @@ python benchmark.py warmup --model llama3.2:3b --model qwen2.5:7b --output resul
 
 This interleaves three fixed warm-up tickets for each model using the unchanged prompt, records `ollama ps` and `/api/ps` evidence, and checks both models remain resident on CPU. It never changes memory allocation. A failed attempt should be saved; try `llama3.2:1b` + `qwen2.5:7b`, then `llama3.2:1b` + `llama3.2:3b` if necessary. If no pair fits, the brief allows reporting that evidence and testing singles instead.
 
-## 3. Tune the chosen pair (odd rows ONLY)
+### Tune the chosen pair on the odd rows
 
 Recover A1 per-ticket prediction CSVs for both models and verify unchanged digest, prompt, version, machine. The checked-in A1 1B CSV may be a development run; verify its provenance before reuse. If a record is unavailable or conditions changed, start each model on the original host and run a new tuning evaluation on the load generator, e.g.:
 
@@ -68,12 +66,21 @@ python accuracy.py tune --small results/tuning-3b/predictions.csv --large result
 
 The analysis shows accuracy, confusion matrices, and **precision by each predicted category**. Optionally estimate a proposed category list with repeatable `--accept 'Credit reporting|Debt collection'` arguments (illustrative syntax only, NOT selected settings). The estimate uses only tuning rows; it is not a measured cascade. The team selects two settings, documents the category lists, false-acceptance evidence, rationale and resident pair in `escalation_rule.md`, and completes `predictions.md` before formal testing.
 
+## 3. Record predictions
+
+Record the expected fastest qualifying configuration, the escalation fraction, accuracy and median latency for each cascade setting, and the categories expected to lose accuracy. The worksheet requires the predictions and rule to be committed before the first A2 benchmark. [Prediction record](predictions.md) · [Escalation rule](escalation_rule.md)
+
 ```powershell
 git add -- predictions.md escalation_rule.md
 git commit -m 'Freeze escalation rule and Assignment 2 predictions before held-out testing'
 ```
 
-## 4. Held-out accuracy
+## 4. Test and measure
+
+- **4-1. Top model alone.** Run `python 4-1_top-model-benchmark/run_step4_1.py` to measure Qwen on the 90 test tickets. [Instructions](4-1_top-model-benchmark/README.md) · [Results](4-1_top-model-benchmark/step4-1-report.md)
+- **4-2. Other A1 models alone.** Run `python 4-2_other-models-benchmark/run_step4_2.py` to measure Llama 1B and 3B individually against the Step 1 limits. [Instructions](4-2_other-models-benchmark/README.md) · [Results](4-2_other-models-benchmark/step4-2-report.md)
+
+### Held-out accuracy
 
 For each single model and both chosen cascade settings, use a unique run ID. On SUT:
 
@@ -100,15 +107,15 @@ python benchmark.py warmup --model llama3.2:3b --model qwen2.5:7b --output resul
 
 Run the actual accuracy evaluation with `--mode cascade --model llama3.2:3b --run-id acc-cascade1`. Copy the SUT's `logs/acc-cascade1.jsonl` to the generator, then score with `--cascade-logs logs/acc-cascade1.jsonl`. Repeat using setting 2 and its fixed acceptance list. Raw data include errors in the accuracy denominator.
 
-Example comparison (assuming Qwen is the A1 top model; verify against the final A1 report):
+To compare the saved A2 results to the Step 1 limits, run the following from `Assignment 2` with an unused output filename.
 
 ```powershell
-python accuracy.py compare --top results/acc-qwen/accuracy.json --config 'Qwen=results/acc-qwen/accuracy.json' --config 'Llama1B=results/acc-1b/accuracy.json' --config 'Llama3B=results/acc-3b/accuracy.json' --config 'Cascade1=results/acc-cascade1/accuracy.json' --config 'Cascade2=results/acc-cascade2/accuracy.json' --output results/accuracy-comparison.json
+python accuracy.py compare --top 1_accuracy-limits/a2-test-rows/accuracy.json --config 'Qwen=4-1_top-model-benchmark/results/qwen-20261127T113825Z-3a6842ff/accuracy.json' --config 'Llama1B=4-2_other-models-benchmark/results/step2-20261127T125523Z-624d7491/llama-1b/accuracy.json' --config 'Llama3B=4-2_other-models-benchmark/results/step2-20261127T125523Z-624d7491/llama-3b/accuracy.json' --config 'Cascade1=results/acc-cascade1/accuracy.json' --config 'Cascade2=results/acc-cascade2/accuracy.json' --output results/comparison-step1.json
 ```
 
 This derives the overall floor from Qwen's test accuracy minus 10 percentage points, each category floor minus 15 points, and qualifies configurations using both. Small category supports must be disclosed (Credit card has seven test tickets).
 
-## 5. Calibrate and speed-test (three runs per configuration)
+### Calibrate and speed-test (three runs per configuration)
 
 On SUT, start the top single model with a calibration run ID; restart Ollama and warm up using `benchmark.py warmup --model qwen2.5:7b --output results/calibration-warmup.json`. Separate generator:
 
@@ -134,6 +141,10 @@ python benchmark.py summary --run results/speed-qwen-1 logs/speed-qwen-1.jsonl -
 
 Report p50 per run, mean, range, standard deviation, pooled p95 with sample count, completed throughput (per configured arrival-window second), JMeter error/unfinished counts, and escalation fraction with its log denominator. Check stats/log reconciliation. Do not report p99. Compare speed arrival rate to A1's 157.33 tickets/hour estimated peak (rounded to 160 for A1). A lower rate does not validate client peak capacity.
 
-## 6. Submission
+## 5. Recommendation
+
+Recommend the fastest configuration that passes the Step 1 overall and per-category limits. Compare its measured latency and accuracy with Qwen alone.
+
+## Submission
 
 Use the eight required slides in the A2 brief: cover, cascade, environment/method, accuracy, speed, trade-off chart, predictions/recommendation, limitations/references/licences/AI declaration. Use the fastest qualifying configuration, even a single model. Link every figure to raw data. State the team designed/chose the final rule, ran tests and made the recommendation; AI assisted with the code/test tooling. Submit `Group11_A2.pptx`, finalized prediction record, escalation rule and `data/workload_rows.txt`; keep all raw results/logs in Git. Deadline 27 November 23:59 Singapore time.
