@@ -1,0 +1,133 @@
+{
+  "overall": {
+    "correct": 32,
+    "wrong": 58,
+    "count": 90,
+    "accuracy_pct": 35.55555555555556
+  },
+  "per_category": {
+    "Credit reporting": {
+      "correct": 16,
+      "wrong": 4,
+      "count": 20,
+      "accuracy_pct": 80.0
+    },
+    "Debt collection": {
+      "correct": 10,
+      "wrong": 3,
+      "count": 13,
+      "accuracy_pct": 76.92307692307692
+    },
+    "Mortgage": {
+      "correct": 3,
+      "wrong": 8,
+      "count": 11,
+      "accuracy_pct": 27.272727272727273
+    },
+    "Credit card": {
+      "correct": 0,
+      "wrong": 7,
+      "count": 7,
+      "accuracy_pct": 0.0
+    },
+    "Bank account or service": {
+      "correct": 2,
+      "wrong": 16,
+      "count": 18,
+      "accuracy_pct": 11.11111111111111
+    },
+    "Consumer loan": {
+      "correct": 0,
+      "wrong": 10,
+      "count": 10,
+      "accuracy_pct": 0.0
+    },
+    "Money transfer or service": {
+      "correct": 1,
+      "wrong": 10,
+      "count": 11,
+      "accuracy_pct": 9.090909090909092
+    }
+  },
+  "confusion_matrix": {
+    "Credit reporting": {
+      "Credit reporting": 16,
+      "Debt collection": 4,
+      "Mortgage": 0,
+      "Credit card": 0,
+      "Bank account or service": 0,
+      "Consumer loan": 0,
+      "Money transfer or service": 0,
+      "ERROR": 0
+    },
+    "Debt collection": {
+      "Credit reporting": 2,
+      "Debt collection": 10,
+      "Mortgage": 1,
+      "Credit card": 0,
+      "Bank account or service": 0,
+      "Consumer loan": 0,
+      "Money transfer or service": 0,
+      "ERROR": 0
+    },
+    "Mortgage": {
+      "Credit reporting": 3,
+      "Debt collection": 5,
+      "Mortgage": 3,
+      "Credit card": 0,
+      "Bank account or service": 0,
+      "Consumer loan": 0,
+      "Money transfer or service": 0,
+      "ERROR": 0
+    },
+    "Credit card": {
+      "Credit reporting": 4,
+      "Debt collection": 3,
+      "Mortgage": 0,
+      "Credit card": 0,
+      "Bank account or service": 0,
+      "Consumer loan": 0,
+      "Money transfer or service": 0,
+      "ERROR": 0
+    },
+    "Bank account or service": {
+      "Credit reporting": 9,
+      "Debt collection": 5,
+      "Mortgage": 1,
+      "Credit card": 0,
+      "Bank account or service": 2,
+      "Consumer loan": 1,
+      "Money transfer or service": 0,
+      "ERROR": 0
+    },
+    "Consumer loan": {
+      "Credit reporting": 6,
+      "Debt collection": 4,
+      "Mortgage": 0,
+      "Credit card": 0,
+      "Bank account or service": 0,
+      "Consumer loan": 0,
+      "Money transfer or service": 0,
+      "ERROR": 0
+    },
+    "Money transfer or service": {
+      "Credit reporting": 5,
+      "Debt collection": 4,
+      "Mortgage": 0,
+      "Credit card": 0,
+      "Bank account or service": 1,
+      "Consumer loan": 0,
+      "Money transfer or service": 1,
+      "ERROR": 0
+    }
+  },
+  "matrix_orientation": "rows=true, columns=prediction",
+  "errors": 0,
+  "split": "test",
+  "mode": "single",
+  "model": "llama3.2:1b",
+  "digest": "baf6a787fdffd633537aa2eb51cfd54cb93ff08e28040095462bb63daf552878",
+  "run_id": "step2-20261127T125523Z-624d7491-llama-1b",
+  "tickets_with_confidence": 90,
+  "confidence_errors": 0
+}
